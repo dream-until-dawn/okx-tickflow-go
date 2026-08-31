@@ -75,21 +75,27 @@ K 线的「收盘价」做决策，等于偷看了这根 K 线走完之后才知
 ### Period：不硬编码周期表
 
 OKX 会加新周期，硬编码一张 bar 列表意味着每次都要跟着改。本库**把 bar 字符串
-原样透传给 OKX**，自己只需要知道两件事：
+原样透传给 OKX**，自己只需要知道它的对齐网格：
 
 ```go
-type Period struct {
-    Bar  string
-    // Next 给定一根 K 线的开盘 ts，返回下一根的开盘 ts——也就是本根的收盘时刻。
-    //
-    // 定长周期就是 ts + 步长；1M/3M 这类按自然月走日历。统一成 Next 而不是
-    // 「步长」，是因为月线不定长，一个 Duration 表达不了它。
-    Next func(ts int64) int64
-}
+type Period struct { /* 内部：step + anchor，或 months + loc */ }
+
+func (p Period) Truncate(ts int64) int64   // 对齐到所属 K 线的开盘时刻
+func (p Period) Next(ts int64) int64       // 下一根的开盘时刻 = 本根的收盘时刻
+func (p Period) Closed(ts, now int64) bool
+func (p Period) LastClosed(now int64) int64
 
 func ParsePeriod(bar string) (Period, error)
-func RegisterPeriod(bar string, next func(int64) int64)   // 未知周期的逃生口
+func RegisterFixedPeriod(bar string, step time.Duration, anchor time.Time) error
 ```
+
+定长周期用 `anchor + k*step` 的网格表达；`1M`/`3M` 不定长，走日历。
+`Next` 而不是暴露一个步长，是因为月线的收盘时刻一个 `Duration` 表达不了。
+
+> 实现时把草稿里的 `RegisterPeriod(bar, next func)` 换成了
+> `RegisterFixedPeriod(bar, step, anchor)`：只给 `Next` 表达不出 `Truncate`，
+> 而 Syncer 对齐区间、Feed 判收盘都要 `Truncate`。`step + anchor` 能表达任何
+> 定长网格，正好覆盖「OKX 新增了一个周期」这个唯一的实际需求。
 
 **时区对齐必须由 Period 携带。** `1D` 按香港时间 UTC+8 对齐，`1Dutc` 才是 UTC，
 两者是**两条不同的序列**，不可混存、不可互相顶替。收盘判定也各按各的时区。
@@ -116,11 +122,20 @@ type Source interface {
 | 近端 / 远端是两个端点 | 近端走 `Candles`，远端走 `HistoryCandles`，自动路由 |
 | 含未完结的当前一根 | 丢弃 `Confirm == false` |
 
-限速走上游的 `WithLimiter` 注入点，重试上游已有，本库不重复造。
+限速走上游的 `WithLimiter` 注入点，重试上游已有，本库不重复造；
+`okxsource` 另有一个默认 120ms 的保守节流，供没注入限流器时兜底。
 
-> ⚠️ **history-candles 的可回溯深度按周期不同、且 OKX 未文档化。**
-> 1m 能回溯多久必须实测。`Syncer` 遇到「请求了更早的区间但返回空」时，
-> 应把该区间记为「已确认无数据」并停止继续往前，而不是无限翻页。
+`Source` 的形态定成「一次调用缓冲整个区间」而不是回调流式：
+
+```go
+type Source interface {
+    Fetch(ctx context.Context, req FetchRequest) ([]Candle, error)
+}
+```
+
+因为 OKX **只能往更旧的方向翻页**（`after` 游标），而 `Store.Append` 要求升序。
+要流式升序输出就得先攒完再翻正——那就等于缓冲。既然如此，不如把「控制区间
+大小」这件事明确交给上层：`Syncer` 已经按 chunk 切好了，单块内存有界。
 
 ---
 
@@ -195,8 +210,11 @@ ts int64 | open high low close vol volCcy volCcyQuote  (7 × float64)
 
 ```go
 type Store interface {
-    // Append 追加已完结 K 线。要求按 ts 升序且大于当前 lastTs；重复 ts 忽略。
+    // Append 在末尾追加。要求 ts 严格升序且首根晚于 LastTs。同步最新数据的快路径。
     Append(instID, bar string, cs []Candle) error
+
+    // Merge 并入任意位置，同 ts 以新数据为准。回填走这条，代价是一次全文件重写。
+    Merge(instID, bar string, cs []Candle) error
 
     // Iter 返回 [from, to) 的游标。Feed 走这条——大范围回测不该把
     // 几百万根一次性读进内存。
@@ -207,32 +225,53 @@ type Store interface {
 
     Meta(instID, bar string) (Meta, error)
 
-    // Replace 覆盖已有区间。罕见路径——OKX 偶尔会修正历史 K 线。
-    Replace(instID, bar string, cs []Candle) error
+    // AddCoverage 记录「这一段已请求并确认」。见下。
+    AddCoverage(instID, bar string, r Range) error
 
-    Close() error
-}
-
-type Iterator interface {
-    Next() bool
-    Candle() Candle
-    Err() error
+    Series() ([]SeriesID, error)
     Close() error
 }
 ```
 
-**并发：v1 只保证进程内安全**（`sync.RWMutex`，单 writer 多 reader）。
-跨进程另外用 best-effort 锁文件（内含 PID + 时间戳，便于识别陈旧锁），
-但不承诺——跨进程写同一份数据本身就该由使用者规避。
+**为什么 coverage 要单独一个写入口，而不是从 Append 推导。**
+一段区间里一根 K 线都没有，可能是 OKX 本就没产出，也可能是还没拉——
+数据本身分不出这两种。只有发起请求的一方知道是哪种，所以由它来记。
+
+**Append 与 Merge 分开**，是因为把两者合成一个「智能写入」会掩盖一个
+O(n²) 陷阱：回填若按 chunk 逐块 Merge，每块都要重写整个文件。分成两个方法，
+调用方就必须显式决定「这是追加还是回填」，也就必须把整段回填攒成一次 Merge。
+
+**并发：只保证进程内安全**（`sync.RWMutex`，多读单写）。跨进程写同一份数据
+不受保护——那本就该由使用者规避。
+
+遍历期间若有人 `Merge`，文件被整体重写、下标随之失效。游标靠一个 generation
+计数发现这件事并**报错**，而不是接着读——那读到的是另一个位置上的数据，
+是无声的错。`Append` 不改变已有下标，所以不触发失效。
 
 ### Syncer
 
 ```go
-func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (SyncReport, error)
+func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (Report, error)
 ```
 
-读 `Meta.coverage` → 求出缺失区间 → 只拉这些 → 落库 → 合并 coverage。
-`SyncReport` 报告新增根数、HTTP 请求次数、以及确认为空洞的区间。
+读 `Meta.Coverage` → 求出缺失区间 → 只拉这些 → 落库 → 合并 coverage。
+`Report` 报告新增根数、拉取批次、确认为空洞的区间，以及**没落在周期网格上的
+根数**（不为 0 就说明该周期的锚点对不上了）。
+
+三条实现时才定下来的规则：
+
+**1. 区间末端截到「最后一根已收盘」。** 当前那根还在走，收盘价尚不可知。
+若把它算进 coverage，等它收盘后就再也不会去补——那根 K 线会永久停在一个
+半截的值上，而且悄无声息。
+
+**2. 追加与回填走不同的路。** 缺失段整体晚于已有数据 → 逐块拉、逐块落库、
+逐块记 coverage，被打断时进度留着；否则是回填 → 整段攒在内存里一次 `Merge`，
+成功后才记 coverage。回填有 `WithMaxMergeCandles`（默认 100 万根 ≈ 64MB）
+兜底，超了就报错并告诉使用者把窗口切小，而不是默默吃内存。
+
+**3. `From` 必填，不提供「从最早开始」。** history-candles 的可回溯深度按周期
+不同且未文档化，无边界地往前探测既慢、又无从判断该在哪停——一段区间没有
+K 线，可能是到头了，也可能只是那阵子没成交。要深回填就自己按窗口分段调用。
 
 ---
 
@@ -441,11 +480,32 @@ OKX 的历史资金费率**只保留约 3 个月**。上游有 `FundingRateHisto
 
 ---
 
+## 实测记录（2026-08-31，BTC-USDT-SWAP）
+
+文档里查不到、只能打真实接口问出来的三件事。可重跑：
+`TICKFLOW_LIVE=1 go test ./source/okxsource/`。
+
+**周期对齐全部对上。** 17 个周期（`1m` `5m` `15m` `1H` `4H` `6H` `6Hutc`
+`12H` `12Hutc` `1D` `1Dutc` `2D` `3D` `1W` `1Wutc` `1M` `1Mutc`）的开盘时间
+都落在内置表算出的网格上。其中 **`2D` / `3D` 的锚点原本是推定的**——OKX 没有
+文档说明哪两天、哪三天归为一根——按「自 epoch 起按港时自然日计数」推出来的
+网格，实测对上了。港时与 UTC 的分叉也确认了：`1D` 的开盘落在 UTC 16:00，
+`1Dutc` 落在 UTC 00:00，确实是两条不同的序列。
+
+**history-candles 至少能回溯 6 年。** `1m` / `5m` / `1H` / `1D` 都能取到
+2020-08-31 的数据（那多半是该合约自己的上线日，不是接口的深度上限）。
+比预想的深得多——这让回填的内存上限成了真问题而不是理论问题：
+1m 线六年约 315 万根，远超默认的 100 万上限，必须分窗口回填。
+
+**未完结的 K 线确实会混在返回里。** `/market/candles` 把当前还在走的那根
+一并返回，`Confirm` 为 false。过滤掉它是 `okxsource` 的责任，
+`TestLiveFetchContract` 专门盯着这一条。
+
 ## 九、排期
 
 | 版本 | 内容 |
 |---|---|
-| v0.1 | `Candle` / `Period` / `Source`(okx) / `Store`(segfile) / `Syncer` |
+| v0.1 | ✅ `Candle` / `Period` / `Source`(okx) / `Store`(segfile) / `Syncer` |
 | v0.2 | 七个内置指标 + 两套口径 + golden test |
 | v0.3 | `Feed` / `View` / 多周期同步 / `Push` |
 | v0.4 | `adapter/okxsim` |
