@@ -6,8 +6,8 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v0.1。** 已可用：任意标的任意周期的历史 K 线同步与持久化。
-> 指标与视图（`Feed`）尚未实现，见 [设计草稿](docs/design.md) 与下方排期。
+> **状态：v0.2。** 已可用：任意标的任意周期的历史 K 线同步与持久化，
+> 以及七个内置技术指标（两套口径）。视图（`Feed`）尚未实现，见下方排期。
 
 ## 安装
 
@@ -73,6 +73,67 @@ OKX 的历史资金费率**只保留约 3 个月**。技术上可以从今天起
 全都不计至少是**一致**的偏差——系统性高估多头持仓收益、低估空头，方向已知，
 可以在解读结果时统一扣减。`adapter/okxsim` 的 `ToBar` 因此永远不填 `Funding`。
 
+## 技术指标
+
+七个内置指标，全部是流式的——每来一根 K 线调一次 `Update`，代价与历史长度无关：
+
+```go
+inds := []indicator.Indicator{
+    indicator.MA(20), indicator.EMA(20),
+    indicator.MACD(12, 26, 9),
+    indicator.KDJ(9, 3, 3),
+    indicator.RSI(14), indicator.CCI(20),
+    indicator.BOLL(20, 2),
+}
+for it.Next() {
+    for _, ind := range inds {
+        vals := ind.Update(it.Candle())   // 未 warmup 完时给 NaN，不是 0
+    }
+}
+```
+
+外部指标只要实现 `indicator.Indicator` 接口，就能和内置的一样用。
+
+跑一遍看看：
+
+```
+go run ./examples/indicators -inst BTC-USDT-SWAP -bar 15m -root ./data
+```
+
+### 两套口径，差异只有三处
+
+同一个指标名，TradingView 与国内行情软件算出来的数不一样。默认 TV，构造时可换：
+
+```go
+indicator.MACD(12, 26, 9, indicator.CN)      // 国内软件口径
+indicator.SetDefaultConvention(indicator.CN) // 或改全局默认
+```
+
+| 处 | TV | CN | 影响 |
+|---|---|---|---|
+| **递归平均的播种** | 前 n 个样本的简单平均 | 首个样本 | EMA、MACD、RSI |
+| **MACD 柱** | `DIF − DEA` | `2 × (DIF − DEA)` | MACD |
+| **KDJ 平滑** | 简单移动平均，无 J 线 | 指数式 `SMA(n,1)` | KDJ |
+
+**MA、CCI、BOLL 两套完全一致**——不为了对称而编造差异。BOLL 的标准差按
+**总体 `n`**（不是样本 `n−1`），两套口径都如此。
+
+播种那一条是**暂时**的：影响按 `(1−α)^k` 衰减。实测走满 5760 根 15m 之后，
+两套口径的 RSI(14) 已经完全相同；而柱子乘 2 和 KDJ 的平滑方式是**永久**差异。
+
+> TV 口径下的 **J 线是本库补的**——TradingView 的 Stochastic 没有 J 线，
+> 这里在两套口径下都按 `J = 3K − 2D` 给出，好让字段结构一致。
+
+### 「增量 == 批量」是结构上成立的
+
+窗口类指标（MA / BOLL / CCI / KDJ）每步在窗口上**重算**，而不是增量维护累加和——
+增量维护 `sum` 会随步数累积浮点漂移，几百万根之后就和「把这 n 根拿出来算一遍」
+对不上了，而后者正是批量定义。递归类指标本就以递推定义，两种算法是同一个。
+
+代价实测（Ryzen 7 5700X，全部零分配）：MA(20) 11ns、EMA(20) 5ns、MACD 7ns、
+BOLL(20) 35ns、CCI(20) 39ns、KDJ 42ns、RSI 7ns。**九个指标一整套 202ns/步**——
+百万步的回测在指标上一共花 0.2 秒。
+
 ## 存储格式
 
 默认实现 `store/segfile` 是定长记录文件，零第三方依赖：
@@ -110,7 +171,7 @@ TICKFLOW_LIVE=1 go test ./source/okxsource/
 | 版本 | 内容 |
 |---|---|
 | v0.1 | ✅ `Candle` / `Period` / `Source` / `Store`(segfile) / `Syncer` |
-| v0.2 | 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + golden test |
+| v0.2 | ✅ 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + 三层测试 |
 | v0.3 | `Feed` / `View` / 多周期同步 / 实时 `Push` |
 | v0.4 | `adapter/okxsim` |
 | v1.0 | 文档 + 真实数据端到端验证 |
