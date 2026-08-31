@@ -1,0 +1,33 @@
+# 仓库内一律使用 LF，并且 checkout 出来也保持 LF。
+#
+# 不加这个文件时，Windows 上默认的 core.autocrlf=true 会在检出时把工作区转成 CRLF，
+# 于是不同平台的贡献者会因为行尾差异产生无意义的整文件 diff。这里显式钉死，
+# 使行尾不再取决于各人的 git 配置。
+* text=auto eol=lf
+
+# Go 生态的文本文件全部走 LF（gofmt 输出本身就是 LF）。
+*.go     text eol=lf
+*.mod    text eol=lf
+*.sum    text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.json   text eol=lf
+LICENSE  text eol=lf
+
+# Windows 平台脚本必须是 CRLF，否则某些解释器会报错。
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制文件不做任何行尾转换。
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.gz   binary
+*.zip  binary
+*.pdf  binary
+
+# 让 GitHub 的语言统计忽略示例代码。
+examples/** linguist-documentation
