@@ -91,8 +91,14 @@ func (m *memStore) Iter(instID, bar string, from, to int64) (Iterator, error) {
 }
 
 func (m *memStore) Range(instID, bar string, from, to int64) ([]Candle, error) {
+	k := key(instID, bar)
+	if _, ok := m.data[k]; !ok {
+		// 与 segfile 保持一致：没存过的序列要报 ErrNoSeries，而不是给个空切片。
+		// 测试替身在这里撒谎的话，「辅周期没同步过」这类错误就测不出来。
+		return nil, fmt.Errorf("%w: %s/%s", ErrNoSeries, instID, bar)
+	}
 	var out []Candle
-	for _, c := range m.data[key(instID, bar)] {
+	for _, c := range m.data[k] {
 		if c.Ts >= from && (to == 0 || c.Ts < to) {
 			out = append(out, c)
 		}

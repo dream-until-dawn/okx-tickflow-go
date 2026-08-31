@@ -55,36 +55,13 @@ import (
 	tickflow "github.com/dream-until-dawn/okx-tickflow-go"
 )
 
-// Indicator 是一个流式技术指标。
+// Indicator 是一个流式技术指标，是 tickflow.Indicator 的别名。
 //
-// 外部实现只需满足这个接口，就能和内置指标一样挂进 Feed。
-type Indicator interface {
-	// Name 是指标在视图里的键名，如 "ma20"、"macd"。
-	Name() string
-
-	// Fields 是多输出指标的字段名，如 MACD 的 ["dif","dea","hist"]。
-	// 单输出指标返回 nil。
-	Fields() []string
-
-	// Warmup 是【出第一个有效值】所需的 K 线根数。
-	//
-	// 注意它的含义是「值从此有定义」，不是「值已收敛」。EMA 一族即便有了定义，
-	// 也还要再走若干个周期才稳定下来，这与口径无关。
-	Warmup() int
-
-	// Update 喂入一根【已完结】的 K 线，返回本根对应的指标值。
-	//
-	// 尚未 warmup 完时返回 NaN——不是 nil，也不是 0。NaN 会沿运算传染，
-	// 能把「拿未就绪的指标去比较」这类误用暴露出来；返回 0 则会让策略在开头
-	// 几十步安静地做出错误决策。
-	//
-	// 返回的切片由指标【复用】，调用方不得把它留到下一次 Update 之后。
-	// 需要留存请自行拷贝，或用 Compute。
-	Update(c tickflow.Candle) []float64
-
-	// Reset 清空全部内部状态，回到刚构造出来的样子。
-	Reset()
-}
+// 接口本身定义在根包：Feed 要消费指标，而本包要用 tickflow.Candle，
+// 定义放在任何一边都会形成循环引用。两边写哪个都一样。
+//
+// 外部实现只要满足这个接口，就能和内置指标一样挂进 Feed。
+type Indicator = tickflow.Indicator
 
 // Convention 是指标的计算口径。
 type Convention int
@@ -162,17 +139,7 @@ func mustPositive(what string, n int) {
 // Keys 返回指标在视图里的全部键名。
 //
 // 单输出为 Name()，多输出为 Name()+"."+字段名，如 "macd.dif"。
-func Keys(ind Indicator) []string {
-	f := ind.Fields()
-	if len(f) == 0 {
-		return []string{ind.Name()}
-	}
-	out := make([]string, len(f))
-	for i, k := range f {
-		out[i] = ind.Name() + "." + k
-	}
-	return out
-}
+func Keys(ind Indicator) []string { return tickflow.IndicatorKeys(ind) }
 
 // Compute 把一批 K 线依次喂给指标，返回每根对应的值（各自独立，可安全持有）。
 //

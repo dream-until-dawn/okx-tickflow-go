@@ -6,8 +6,8 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v0.2。** 已可用：任意标的任意周期的历史 K 线同步与持久化，
-> 以及七个内置技术指标（两套口径）。视图（`Feed`）尚未实现，见下方排期。
+> **状态：v0.3。** 数据层与视图层已完整：同步与持久化、七个内置指标（两套口径）、
+> 多周期同步的可步进视图。剩下与记账器对接的适配层，见下方排期。
 
 ## 安装
 
@@ -134,6 +134,79 @@ indicator.SetDefaultConvention(indicator.CN) // 或改全局默认
 BOLL(20) 35ns、CCI(20) 39ns、KDJ 42ns、RSI 7ns。**九个指标一整套 202ns/步**——
 百万步的回测在指标上一共花 0.2 秒。
 
+## Feed：可步进的多周期视图
+
+回测引擎消费本库的方式。主周期步进，辅周期只提供**最后一根已收盘**的上下文：
+
+```go
+f, _ := tickflow.NewFeed(store, tickflow.Config{
+    InstID:   "BTC-USDT-SWAP",
+    Base:     "15m",                    // 步进的主周期
+    Extra:    []string{"1H", "1D"},     // 辅周期，只读不步进
+    Lookback: 5,                        // 视图能往回看几根
+    Indicators: map[string][]tickflow.Indicator{
+        "15m": {indicator.MA(20), indicator.MACD(12, 26, 9), indicator.RSI(14)},
+        "1H":  {indicator.EMA(20)},
+        "1D":  {indicator.MA(5, indicator.Named("ma5d"))},
+    },
+})
+defer f.Close()
+
+h, _ := f.Handle("15m", "macd.hist")    // 循环外预解析，热路径省一次 map 查找
+
+for f.Next() {
+    v := f.View()
+    if !v.Ready() { continue }          // 指标还没 warmup 完
+
+    v.Close()                            // 当前收盘价
+    v.At(h)                              // MACD 柱，按句柄取
+    v.Prev(3).Close()                    // 前 3 根的收盘价
+    f.TF("1D").Ind("ma5d")               // 日线的 MA5——永远是【已收盘】那根
+}
+if err := f.Err(); err != nil { ... }
+```
+
+跑一遍看看（含对「高周期收盘前不可见」的现场验证）：
+
+```
+go run ./examples/feed -inst BTC-USDT-SWAP -root ./data
+```
+
+**指标按周期挂**，不是拉平成一个列表——1D 的 MA20 和 15m 的 MA20 是完全不同的
+东西，混在一起迟早出事。
+
+### `f.TF(bar)` 永远给最后一根已收盘的
+
+这是本库最主要的价值。主周期走到 `08-31 14:30`（这根 14:45 收盘）时：
+
+```
+1H  给 13:00 那根（14:00 收盘）——14:00 那根要到 15:00 才收盘，不可见
+1D  给 08-29 16:00 那根（08-30 16:00 收盘，港时 08-30 全天）
+```
+
+「高周期 K 线在收盘前不可见」是自制回测里最常见、也最难自查的未来函数。
+测试同时验两个方向：**不能超前**（看到的必须已收盘）和**不能落后**
+（下一根必须还没收盘）——只验一个方向的话，一个「永远返回第一根」的实现也能通过。
+
+### 其余几条
+
+**warmup 自动前推。** `MA(200)` 需要 200 根，Feed 自己往前多读一段喂指标、
+不产出步进，使用者不必手工把 `From` 往前挪。没读满时 `v.Ready()` 如实报 false，
+而不是给出一个用半截历史算出来的值。
+
+**辅周期默认从库里读独立序列**（OKX 自己算的，最准）。`Aggregate: true` 改为
+从主周期聚合，只需同步一个周期，代价是空洞与边界会让结果与交易所的官方 K 线
+有偏差——别拿聚合出来的日线去和交易所对数。两种模式的**可见性时点完全一致**，
+有测试盯着：不然一拨开关回测结果就变了，而原因藏在没人会查的地方。
+
+**实盘复用同一套代码。** `f.Push(bar, candle)` 手工喂一根，`store` 传 nil 就是
+纯实盘形态。WebSocket 收到收盘 K 线后调它，指标与视图的代码和回测完全一样。
+ts 必须严格递增且对齐，重复与乱序推送会报错——实盘里这两种都真实存在。
+
+**热路径零分配**（Ryzen 7 5700X）：推进一步 30ns（单周期）/ 65ns（三周期聚合），
+`v.At(handle)` 1.7ns、`v.Ind("name")` 10.6ns、`v.Prev(3).Close()` 3.8ns。
+`View` 是「一个指针加一个下标」的值类型，`Prev(n)` 只是把下标往回挪。
+
 ## 存储格式
 
 默认实现 `store/segfile` 是定长记录文件，零第三方依赖：
@@ -172,7 +245,7 @@ TICKFLOW_LIVE=1 go test ./source/okxsource/
 |---|---|
 | v0.1 | ✅ `Candle` / `Period` / `Source` / `Store`(segfile) / `Syncer` |
 | v0.2 | ✅ 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + 三层测试 |
-| v0.3 | `Feed` / `View` / 多周期同步 / 实时 `Push` |
+| v0.3 | ✅ `Feed` / `View` / 多周期同步 / 实时 `Push` |
 | v0.4 | `adapter/okxsim` |
 | v1.0 | 文档 + 真实数据端到端验证 |
 
