@@ -60,6 +60,25 @@ type FeedConfig struct {
 	// NoAutoWarmup 关掉自动预热，直接从 From 开始读。
 	// 此时开头若干根的指标会是 NaN，用 View.Ready() 判断。
 	NoAutoWarmup bool
+
+	// MarkStore 提供【标记价】K 线，跟着主周期锁步推进，由 View.MarkPx 与
+	// View.Mark 取用。
+	//
+	// 为什么要单独一个 Store：标记价的 BTC-USDT-SWAP/1m 与普通 K 线的
+	// BTC-USDT-SWAP/1m 是两条不同的序列，同一个 (instId, bar) 键。
+	// store/segfile 用命名空间把它们分开：
+	//
+	//	store, _ := segfile.OpenReadOnly(root)                 // 普通 K 线
+	//	mark, _  := segfile.OpenReadOnly(root, segfile.Mark)   // 标记价
+	//
+	// 为什么值得费这个事：OKX 的强平按标记价判定，不是成交价。缺了它，
+	// okx-position-simulator-go 会退回用最新成交价顶替，于是影线会制造出
+	// 真实【不会发生】的强平——对尾部风险就是强平的策略（比如做多网格）
+	// 尤其致命，而且是假阴性，结果里不留痕迹。
+	//
+	// 只对【主周期】生效：记账内核是按主周期一步一步推进的，辅周期只提供
+	// 上下文，不参与撮合与强平。
+	MarkStore Store
 }
 
 // Feed 把存储里的 K 线连同指标，变成可以一步一步走的视图。
@@ -106,6 +125,7 @@ type Feed struct {
 
 	base   *tfSeries
 	extras []*tfSeries
+	markIt *peekIter
 	byBar  map[string]*tfSeries
 	order  []*tfSeries // base 在前，便于统一遍历
 
@@ -192,6 +212,9 @@ func NewFeed(store Store, cfg FeedConfig) (*Feed, error) {
 		f.order = append(f.order, s)
 	}
 
+	if cfg.MarkStore != nil {
+		f.base.marks = make([]Candle, f.base.capN)
+	}
 	if store == nil {
 		return f, nil
 	}
@@ -241,6 +264,19 @@ func (f *Feed) openIterators(cfg FeedConfig) error {
 		return err
 	}
 	f.base.it = &peekIter{it: it}
+
+	if cfg.MarkStore != nil {
+		mit, err := cfg.MarkStore.Iter(f.inst, cfg.Base, baseWarm, f.to)
+		if err != nil {
+			if errors.Is(err, ErrNoSeries) {
+				return fmt.Errorf("tickflow: 标记价序列 %s/%s 不在 MarkStore 里——"+
+					"先同步它（okxsource.MarkPrice + segfile.Mark 命名空间）: %w",
+					f.inst, cfg.Base, err)
+			}
+			return err
+		}
+		f.markIt = &peekIter{it: mit}
+	}
 
 	if cfg.Aggregate {
 		return nil
@@ -323,7 +359,33 @@ func (f *Feed) step(c Candle) error {
 			}
 		}
 	}
-	return f.base.push(c)
+	if err := f.base.push(c); err != nil {
+		return err
+	}
+	f.advanceMark(c.Ts)
+	return nil
+}
+
+// advanceMark 把标记价序列推到与主周期这一根【同一个】开盘时刻上。
+//
+// 用同 ts 而不是「最后一根已收盘」：标记价 K 线与主周期这一根是同时收盘的，
+// 它的收盘价在这一刻就已知，不构成未来函数。更早的那些说明主周期有空洞，
+// 丢掉即可；更晚的说明标记价这一根缺失，留空。
+func (f *Feed) advanceMark(ts int64) {
+	if f.markIt == nil || f.base.marks == nil {
+		return
+	}
+	for {
+		m, ok := f.markIt.peek()
+		if !ok || m.Ts > ts {
+			return
+		}
+		f.markIt.take()
+		if m.Ts == ts {
+			f.base.setMark(m)
+			return
+		}
+	}
 }
 
 // Push 手工喂一根【已完结】的 K 线，供实盘使用。
@@ -354,6 +416,29 @@ func (f *Feed) Push(bar string, c Candle) error {
 		return f.step(c)
 	}
 	return s.push(c)
+}
+
+// PushWithMark 同 Push，并给出这一根对应的【标记价】K 线，供实盘使用。
+//
+// 只能推主周期——标记价只对主周期生效，见 FeedConfig.MarkStore。
+// mark 的 ts 必须与 c 相同：它们是同一个时刻的两条序列，对不上多半是取错了根。
+func (f *Feed) PushWithMark(bar string, c, mark Candle) error {
+	s, ok := f.byBar[bar]
+	if !ok || s != f.base {
+		return fmt.Errorf("tickflow: 标记价只对主周期 %q 生效，不能推给 %q", f.base.bar, bar)
+	}
+	if f.base.marks == nil {
+		return errors.New("tickflow: 本 Feed 没有配 MarkStore，View.MarkPx 不会有值")
+	}
+	if mark.Ts != c.Ts {
+		return fmt.Errorf("tickflow: 标记价 K 线的 ts %d 与行情的 %d 对不上——"+
+			"它们是同一时刻的两条序列", mark.Ts, c.Ts)
+	}
+	if err := f.Push(bar, c); err != nil {
+		return err
+	}
+	f.base.setMark(mark)
+	return nil
 }
 
 // View 返回主周期【当前这一根】的视图。
@@ -430,11 +515,16 @@ func (f *Feed) Close() error {
 	}
 	f.closed = true
 	var first error
+	its := make([]*peekIter, 0, len(f.order)+1)
 	for _, s := range f.order {
-		if s.it == nil {
+		its = append(its, s.it)
+	}
+	its = append(its, f.markIt)
+	for _, it := range its {
+		if it == nil {
 			continue
 		}
-		if err := s.it.it.Close(); err != nil && first == nil {
+		if err := it.it.Close(); err != nil && first == nil {
 			first = err
 		}
 	}
@@ -459,6 +549,7 @@ type tfSeries struct {
 
 	capN    int
 	candles []Candle
+	marks   []Candle // 仅主周期，且只在配了 MarkStore 时分配
 	cols    [][]float64
 	n       int64 // 已推入的总根数，也是下一根的绝对序号
 
@@ -507,6 +598,11 @@ func newTFSeries(bar string, p Period, inds []Indicator, lookback int) (*tfSerie
 func (s *tfSeries) push(c Candle) error {
 	slot := int(s.n % int64(s.capN))
 	s.candles[slot] = c
+	// 环形缓冲会复用槽位。不清空的话，标记价缺根时这一格里留着的是
+	// capN 根之前那一根的值——那比没有标记价更糟，它看起来是对的。
+	if s.marks != nil {
+		s.marks[slot] = Candle{}
+	}
 	off := 0
 	for i, ind := range s.inds {
 		v := ind.Update(c)
@@ -524,6 +620,21 @@ func (s *tfSeries) push(c Candle) error {
 }
 
 func (s *tfSeries) at(abs int64) Candle { return s.candles[int(abs%int64(s.capN))] }
+
+// setMark 给【刚推入的那一根】挂上标记价 K 线。须在 push 之后调用。
+func (s *tfSeries) setMark(m Candle) {
+	if s.marks == nil || s.n == 0 {
+		return
+	}
+	s.marks[int((s.n-1)%int64(s.capN))] = m
+}
+
+func (s *tfSeries) markAt(abs int64) Candle {
+	if s.marks == nil {
+		return Candle{}
+	}
+	return s.marks[int(abs%int64(s.capN))]
+}
 
 func (s *tfSeries) ready() bool { return s.n >= int64(s.warmup) }
 
@@ -598,6 +709,34 @@ func (v View) px(get func(Candle) float64) float64 {
 		return math.NaN()
 	}
 	return get(v.s.at(v.abs))
+}
+
+// Mark 返回这一根对应的【标记价】K 线。
+//
+// 第二个返回值为 false 表示没有：Feed 没配 MarkStore、视图无效、或者标记价
+// 序列在这个时刻缺根。缺根是真实存在的——别把零值当成价格。
+func (v View) Mark() (Candle, bool) {
+	if !v.Valid() {
+		return Candle{}, false
+	}
+	m := v.s.markAt(v.abs)
+	return m, m.Ts != 0
+}
+
+// MarkPx 返回标记价（标记价 K 线的收盘价）；没有时返回 NaN。
+//
+// 喂给 okx-position-simulator-go 时用它：
+//
+//	bar, _ := simbar.ToBar(inst, v.Candle(), simbar.WithMarkPx(v.MarkPx()))
+//
+// 缺标记价时给 NaN 而不是 0，与本库其余部分一致——0 是个看起来正常的价格。
+// simbar.ToBar 会把 NaN 的标记价当作「没有」处理，而不是写进 Bar。
+func (v View) MarkPx() float64 {
+	m, ok := v.Mark()
+	if !ok {
+		return math.NaN()
+	}
+	return m.Close
 }
 
 // Ind 按键名取指标值。键名未知或视图无效时返回 NaN。

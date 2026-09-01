@@ -73,16 +73,48 @@ const (
 	// blockRecords 是遍历时单次读取的记录数（64KB 一块）。
 	blockRecords = 1024
 
-	// candlesDir 是 K 线在数据目录下的命名空间。
-	//
-	// 多这一层是给以后留位：逐笔成交、盘口深度都是形态完全不同的数据，
-	// 将来要放进来时不必迁移已有的 K 线。现在多一个空目录，比以后动全部人的
-	// 数据便宜得多。
-	candlesDir = "candles"
-
 	// lockFile 是写锁文件名，见 Open 的说明。
 	lockFile = ".lock"
 )
+
+// SeriesKind 是数据在数据目录下的命名空间，同时也是一个 Option。
+//
+// Store 按 (instId, bar) 索引，而标记价的 BTC-USDT-SWAP/1m 与普通 K 线的
+// BTC-USDT-SWAP/1m 是【两条不同的序列】——同一个键，两份数据。用命名空间分开，
+// 而不是拼一个 "BTC-USDT-SWAP:mark" 之类的合成 instId：合成键会渗进 Meta、
+// Coverage、SeriesID，以后再拆就是破坏性变更。
+//
+//	segfile.Open(root)                // candles/       普通 K 线
+//	segfile.Open(root, segfile.Mark)  // mark-candles/  标记价
+//	segfile.Open(root, segfile.Index) // index-candles/ 指数价
+//
+// 写锁也在命名空间之内，所以同一进程里同时开一个普通 Store 和一个标记价 Store
+// 不会自己把自己锁住。
+type SeriesKind string
+
+const (
+	// Candles 是普通 K 线，Open 不指定时的默认。
+	Candles SeriesKind = "candles"
+
+	// Mark 是标记价 K 线。
+	//
+	// OKX 的强平按标记价判定而不是成交价。回测里要建模爆仓就必须用这条序列——
+	// 用成交价会让影线制造出真实不会发生的强平，对尾部风险就是强平的策略
+	// （比如做多网格）尤其致命，而且是假阴性，结果里不留痕迹。
+	Mark SeriesKind = "mark-candles"
+
+	// Index 是指数价 K 线。triggerPxType 为 index 的算法委托用得上。
+	// instId 用现货形式，如 "ETH-USDT"。
+	Index SeriesKind = "index-candles"
+)
+
+func (k SeriesKind) apply(s *Store) { s.kind = k }
+
+// Option 配置 Store 的打开方式。SeriesKind 本身就是一个 Option。
+type Option interface{ apply(*Store) }
+
+// knownKinds 用于识别数据目录下哪些子目录是本库的命名空间。
+var knownKinds = []SeriesKind{Candles, Mark, Index}
 
 // ErrReadOnly 表示在只读 Store 上尝试了写操作。
 var ErrReadOnly = errors.New("segfile: 只读模式下不能写入")
@@ -119,6 +151,7 @@ var ErrLocked = errors.New("segfile: 数据目录已被占用")
 // 已打开的句柄影响。
 type Store struct {
 	root     string
+	kind     SeriesKind
 	readOnly bool
 	locked   bool
 
@@ -133,8 +166,8 @@ type Store struct {
 // 主机名与占用时刻。进程崩溃会遗留陈旧的锁文件——本库【不去猜那个进程是否
 // 还活着】：跨平台可靠地判断这件事需要平台相关的依赖，而本库刻意不引入。
 // 确认无人使用后用 ForceUnlock 清掉即可。
-func Open(root string) (*Store, error) {
-	s, err := newStore(root, false)
+func Open(root string, opts ...Option) (*Store, error) {
+	s, err := newStore(root, false, opts)
 	if err != nil {
 		return nil, err
 	}
@@ -147,9 +180,11 @@ func Open(root string) (*Store, error) {
 // OpenReadOnly 以只读模式打开位于 root 的存储。不取锁，可与写者并存。
 //
 // 所有写操作返回 ErrReadOnly。看到的是打开那一刻的快照。
-func OpenReadOnly(root string) (*Store, error) { return newStore(root, true) }
+func OpenReadOnly(root string, opts ...Option) (*Store, error) {
+	return newStore(root, true, opts)
+}
 
-func newStore(root string, readOnly bool) (*Store, error) {
+func newStore(root string, readOnly bool, opts []Option) (*Store, error) {
 	if root == "" {
 		return nil, errors.New("segfile: root 不能为空")
 	}
@@ -157,18 +192,35 @@ func newStore(root string, readOnly bool) (*Store, error) {
 	if err != nil {
 		return nil, fmt.Errorf("segfile: 解析 %s 失败: %w", root, err)
 	}
+	s := &Store{root: abs, kind: Candles, readOnly: readOnly, series: map[string]*series{}}
+	for _, o := range opts {
+		o.apply(s)
+	}
+	if s.kind == "" {
+		return nil, errors.New("segfile: 命名空间不能为空")
+	}
+	if err := validName(string(s.kind), "命名空间"); err != nil {
+		return nil, err
+	}
+
 	if readOnly {
-		if _, err := os.Stat(abs); err != nil {
-			return nil, fmt.Errorf("segfile: 只读打开 %s 失败: %w", abs, err)
+		if _, err := os.Stat(s.dir()); err != nil {
+			return nil, fmt.Errorf("segfile: 只读打开 %s 失败: %w", s.dir(), err)
 		}
-	} else if err := os.MkdirAll(filepath.Join(abs, candlesDir), 0o755); err != nil {
-		return nil, fmt.Errorf("segfile: 创建 %s 失败: %w", abs, err)
+	} else if err := os.MkdirAll(s.dir(), 0o755); err != nil {
+		return nil, fmt.Errorf("segfile: 创建 %s 失败: %w", s.dir(), err)
 	}
 	if err := checkLegacyLayout(abs); err != nil {
 		return nil, err
 	}
-	return &Store{root: abs, readOnly: readOnly, series: map[string]*series{}}, nil
+	return s, nil
 }
+
+// dir 返回本 Store 所属命名空间的目录。
+func (s *Store) dir() string { return filepath.Join(s.root, string(s.kind)) }
+
+// Kind 返回本 Store 所属的命名空间。
+func (s *Store) Kind() SeriesKind { return s.kind }
 
 // Root 返回数据目录的绝对路径，供日志与诊断使用。
 func (s *Store) Root() string { return s.root }
@@ -185,7 +237,7 @@ func (s *Store) Path(instID, bar string) (dat, meta string, err error) {
 	if err := validName(bar, "bar"); err != nil {
 		return "", "", err
 	}
-	dir := filepath.Join(s.root, candlesDir, instID)
+	dir := filepath.Join(s.dir(), instID)
 	return filepath.Join(dir, bar+".dat"), filepath.Join(dir, bar+".meta"), nil
 }
 
@@ -199,9 +251,22 @@ type lockInfo struct {
 	Root  string `json:"root"`
 }
 
-func (s *Store) lockPath() string { return filepath.Join(s.root, lockFile) }
+// lockPath 是写锁的位置。锁在【命名空间之内】——不然同一进程里开一个普通 Store
+// 加一个标记价 Store 就会自己把自己锁住，而它们写的本就是两堆互不相干的文件。
+func (s *Store) lockPath() string { return filepath.Join(s.dir(), lockFile) }
 
 func (s *Store) acquire() error {
+	// v1.1 及更早的写锁在数据目录【根上】，而那时的写者写的正是 candles/ 下的
+	// 文件。若那种进程还活着，我们拿到命名空间里的新锁也照样会和它撞车——
+	// 所以旧锁还在时，普通 K 线这个命名空间要当作已被占用。
+	if s.kind == Candles {
+		legacy := filepath.Join(s.root, lockFile)
+		if _, err := os.Stat(legacy); err == nil {
+			return fmt.Errorf("%w: %s 上有 v1.1 及更早遗留的旧锁（%s）。"+
+				"确认无人使用后调 segfile.ForceUnlock 清掉，或直接删除 %s",
+				ErrLocked, s.root, describeLock(legacy), legacy)
+		}
+	}
 	path := s.lockPath()
 	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
 	if err != nil {
@@ -251,19 +316,37 @@ func describeLock(path string) string {
 	return fmt.Sprintf("持有者 pid=%d host=%s 自 %s 起", li.PID, li.Host, li.Since)
 }
 
-// ForceUnlock 强行清掉 root 上的写锁。
+// ForceUnlock 强行清掉某个命名空间上的写锁，不指定时清 Candles 的。
 //
-// 只在【确认没有任何进程正在写】这个目录时使用——进程崩溃会遗留锁文件，
-// 这是它存在的唯一理由。在写者仍活着时调用它，等于把两个写者放进同一个目录。
-func ForceUnlock(root string) error {
+// 只在【确认没有任何进程正在写】这个命名空间时使用——进程崩溃会遗留锁文件，
+// 这是它存在的唯一理由。在写者仍活着时调用它，等于把两个写者放进同一堆文件。
+//
+// 顺带清掉 v1.1 及更早遗留在数据目录根上的那个锁（那时候锁不分命名空间）。
+func ForceUnlock(root string, opts ...Option) error {
 	abs, err := filepath.Abs(root)
 	if err != nil {
 		return err
 	}
-	if err := os.Remove(filepath.Join(abs, lockFile)); err != nil && !errors.Is(err, os.ErrNotExist) {
-		return err
+	s := &Store{root: abs, kind: Candles}
+	for _, o := range opts {
+		o.apply(s)
+	}
+	for _, p := range []string{s.lockPath(), filepath.Join(abs, lockFile)} {
+		if err := os.Remove(p); err != nil && !errors.Is(err, os.ErrNotExist) {
+			return err
+		}
 	}
 	return nil
+}
+
+// isKnownKind 报告某个子目录名是否本库的命名空间。
+func isKnownKind(name string) bool {
+	for _, k := range knownKinds {
+		if string(k) == name {
+			return true
+		}
+	}
+	return false
 }
 
 // checkLegacyLayout 挡住「数据还在旧布局里」这种情况。
@@ -277,7 +360,7 @@ func checkLegacyLayout(root string) error {
 		return nil // 目录还不存在或读不了，交给后续流程报错
 	}
 	for _, d := range dirs {
-		if !d.IsDir() || d.Name() == candlesDir {
+		if !d.IsDir() || isKnownKind(d.Name()) {
 			continue
 		}
 		files, err := os.ReadDir(filepath.Join(root, d.Name()))
@@ -297,8 +380,8 @@ func checkLegacyLayout(root string) error {
 				return fmt.Errorf("segfile: %s 下的数据还在旧布局里（v0.3 及之前直接放在 "+
 					"<root>/<instId>/），v0.4 起挪到了 <root>/%s/<instId>/。"+
 					"把 %s 这样的目录整个移进 %s 即可，文件本身不用动",
-					root, candlesDir,
-					filepath.Join(root, d.Name()), filepath.Join(root, candlesDir))
+					root, Candles,
+					filepath.Join(root, d.Name()), filepath.Join(root, string(Candles)))
 			}
 		}
 	}
@@ -345,7 +428,7 @@ func (s *Store) get(instID, bar string, create bool) (*series, error) {
 	if se, ok := s.series[key]; ok {
 		return se, nil
 	}
-	se, err := openSeries(filepath.Join(s.root, candlesDir, instID), instID, bar, create, s.readOnly)
+	se, err := openSeries(filepath.Join(s.dir(), instID), instID, bar, create, s.readOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -455,7 +538,7 @@ func (s *Store) Range(instID, bar string, from, to int64) ([]tickflow.Candle, er
 // Series 列出数据目录里已存在的全部序列，按 instId、bar 排序，
 // 实现 tickflow.Store。目录为空时返回 nil 而不是错误。
 func (s *Store) Series() ([]tickflow.SeriesID, error) {
-	base := filepath.Join(s.root, candlesDir)
+	base := s.dir()
 	dirs, err := os.ReadDir(base)
 	if errors.Is(err, os.ErrNotExist) {
 		return nil, nil

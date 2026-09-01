@@ -29,8 +29,43 @@ const (
 )
 
 // Source 从 OKX 拉 K 线。
+// Series 选择拉哪一条价格序列。
+//
+// 三条序列在 OKX 是【各自独立】的端点，形态一样（同样的 ts + OHLC），
+// 但标记价与指数价【没有成交量】，那三个字段恒为 0。
+type Series int
+
+const (
+	// Trades 是普通成交价 K 线，New 不指定时的默认。
+	Trades Series = iota
+
+	// MarkPrice 是标记价 K 线。
+	//
+	// OKX 的强平按标记价判定而不是成交价。回测里要建模爆仓就必须用这条——
+	// 用成交价会让影线制造出真实不会发生的强平。
+	MarkPrice
+
+	// IndexPrice 是指数价 K 线。instId 用【现货形式】，如 "ETH-USDT"
+	// 而不是 "ETH-USDT-SWAP"。
+	IndexPrice
+)
+
+func (s Series) apply(src *Source) { src.series = s }
+
+func (s Series) String() string {
+	switch s {
+	case MarkPrice:
+		return "mark-price"
+	case IndexPrice:
+		return "index"
+	default:
+		return "trades"
+	}
+}
+
 type Source struct {
-	c *okx.Client
+	c      *okx.Client
+	series Series
 
 	recentBars  int
 	minInterval time.Duration
@@ -51,19 +86,27 @@ const (
 	epHistory
 )
 
-// Option 配置 Source。
-type Option func(*Source)
+// Option 配置 Source。Series 本身就是一个 Option：
+//
+//	okxsource.New(client)                        // 普通 K 线
+//	okxsource.New(client, okxsource.MarkPrice)   // 标记价
+//	okxsource.New(client, okxsource.IndexPrice)  // 指数价
+type Option interface{ apply(*Source) }
+
+type optFunc func(*Source)
+
+func (f optFunc) apply(s *Source) { f(s) }
 
 // WithRecentBars 设置「近端」的宽度，默认 1000 根。
 //
 // 游标落在最近这么多根之内时走 /market/candles，否则走 /market/history-candles。
 // OKX 文档称前者只覆盖最近约 1440 根，这里留了余量。
 func WithRecentBars(n int) Option {
-	return func(s *Source) {
+	return optFunc(func(s *Source) {
 		if n > 0 {
 			s.recentBars = n
 		}
-	}
+	})
 }
 
 // WithMinInterval 设置两次请求之间的最小间隔，默认 120ms。
@@ -72,27 +115,27 @@ func WithRecentBars(n int) Option {
 // OKX 各接口的限速档位不同且会调整，以官方文档为准；真要精确控制，
 // 请用 okx.WithLimiter 给客户端注入限流器，并把这里设为 0。
 func WithMinInterval(d time.Duration) Option {
-	return func(s *Source) {
+	return optFunc(func(s *Source) {
 		if d >= 0 {
 			s.minInterval = d
 		}
-	}
+	})
 }
 
 // WithMaxPages 设置单次 Fetch 的最大翻页数，默认 10000。这是个防跑飞的兜底。
 func WithMaxPages(n int) Option {
-	return func(s *Source) {
+	return optFunc(func(s *Source) {
 		if n > 0 {
 			s.maxPages = n
 		}
-	}
+	})
 }
 
-// ForceCandles 强制只用 /market/candles。
-func ForceCandles() Option { return func(s *Source) { s.forceEP = epCandles } }
+// ForceCandles 强制只用近端接口，不走 history 变体。
+func ForceCandles() Option { return optFunc(func(s *Source) { s.forceEP = epCandles }) }
 
-// ForceHistoryCandles 强制只用 /market/history-candles。
-func ForceHistoryCandles() Option { return func(s *Source) { s.forceEP = epHistory } }
+// ForceHistoryCandles 强制只用 history 变体。
+func ForceHistoryCandles() Option { return optFunc(func(s *Source) { s.forceEP = epHistory }) }
 
 // New 构造一个 Source。
 func New(c *okx.Client, opts ...Option) (*Source, error) {
@@ -107,10 +150,13 @@ func New(c *okx.Client, opts ...Option) (*Source, error) {
 		now:         time.Now,
 	}
 	for _, o := range opts {
-		o(s)
+		o.apply(s)
 	}
 	return s, nil
 }
+
+// Series 返回本 Source 拉的是哪一条价格序列。
+func (s *Source) Series() Series { return s.series }
 
 var _ tickflow.Source = (*Source)(nil)
 
@@ -196,18 +242,44 @@ func (s *Source) pick(cursor, boundary int64) endpoint {
 func (s *Source) page(ctx context.Context, instID, bar string, cursor int64, ep endpoint) ([]okx.Candle, error) {
 	s.throttle()
 	r := okx.CandlesRequest{InstID: instID, Bar: bar, After: cursor}
-	if ep == epCandles {
+	near := ep == epCandles
+	if near {
 		r.Limit = candlesLimit
-		cs, err := s.c.Market.Candles(ctx, r)
-		if err != nil {
-			return nil, fmt.Errorf("okxsource: candles %s/%s after=%d: %w", instID, bar, cursor, err)
-		}
-		return cs, nil
+	} else {
+		r.Limit = historyLimit
 	}
-	r.Limit = historyLimit
-	cs, err := s.c.Market.HistoryCandles(ctx, r)
+
+	var (
+		cs  []okx.Candle
+		err error
+	)
+	switch s.series {
+	case MarkPrice:
+		if near {
+			cs, err = s.c.Market.MarkPriceCandles(ctx, r)
+		} else {
+			cs, err = s.c.Market.HistoryMarkPriceCandles(ctx, r)
+		}
+	case IndexPrice:
+		if near {
+			cs, err = s.c.Market.IndexCandles(ctx, r)
+		} else {
+			cs, err = s.c.Market.HistoryIndexCandles(ctx, r)
+		}
+	default:
+		if near {
+			cs, err = s.c.Market.Candles(ctx, r)
+		} else {
+			cs, err = s.c.Market.HistoryCandles(ctx, r)
+		}
+	}
 	if err != nil {
-		return nil, fmt.Errorf("okxsource: history-candles %s/%s after=%d: %w", instID, bar, cursor, err)
+		kind := "history-"
+		if near {
+			kind = ""
+		}
+		return nil, fmt.Errorf("okxsource: %s%s-candles %s/%s after=%d: %w",
+			kind, s.series, instID, bar, cursor, err)
 	}
 	return cs, nil
 }

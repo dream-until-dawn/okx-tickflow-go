@@ -6,7 +6,8 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v1.1。** 公开 API 已收口。指标默认口径与 OKX 平台一致（实测确认）。两年真实数据端到端验收过：同步的根数精确到
+> **状态：v1.2。** 公开 API 已收口。指标默认口径与 OKX 平台一致（实测确认）。
+> 支持标记价 / 指数价序列——回测里建模强平必须用标记价，见下。两年真实数据端到端验收过：同步的根数精确到
 > 个位、重跑零请求、自聚合与 OKX 官方逐位相同、11520 步里对辅周期做了 22974 次
 > 防未来函数检查零违规。详见 [docs/design.md](docs/design.md) 的「v1.0 验收」。
 
@@ -237,6 +238,50 @@ ts 必须严格递增且对齐，重复与乱序推送会报错——实盘里�
 `v.At(handle)` 1.7ns、`v.Ind("name")` 10.6ns、`v.Prev(3).Close()` 3.8ns。
 `View` 是「一个指针加一个下标」的值类型，`Prev(n)` 只是把下标往回挪。
 
+## 标记价：回测里建模强平必须用它
+
+OKX 的强平按**标记价**判定，不是成交价。缺了标记价，
+[okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)
+会退回用最新成交价顶替——于是**影线会制造出真实不会发生的强平**。对尾部风险就是
+强平的策略（比如做多网格）尤其致命，而且是**假阴性**，结果里不留任何痕迹。
+
+标记价由指数价平滑而来，比成交价平稳。实测 200 根 BTC-USDT-SWAP 的 1H：
+平均振幅 **成交价 0.6433% vs 标记价 0.6300%**，标记价更窄的占 146/200。
+
+```
+go run ./examples/sync -inst BTC-USDT-SWAP -bar 15m -days 30 -root ./data -kind mark
+```
+
+```go
+store, _ := segfile.OpenReadOnly(root)                 // 成交价
+mark, _  := segfile.OpenReadOnly(root, segfile.Mark)   // 标记价
+
+f, _ := tickflow.NewFeed(store, tickflow.FeedConfig{
+    InstID: "BTC-USDT-SWAP", Base: "15m",
+    MarkStore: mark,                  // ← 标记价跟着主周期锁步推进
+})
+
+for f.Next() {
+    v := f.View()
+    bar, _ := simbar.ToBar(inst, v.Candle(), simbar.WithMarkPx(v.MarkPx()))
+    sim.Advance(bar)
+}
+```
+
+**对齐规则是「同 ts」而不是「最后一根已收盘」**——标记价 K 线与主周期这一根是
+同时收盘的，它的收盘价在这一刻就已知，用它不构成未来函数。主周期有空洞时标记价
+不会错位到别的时刻上去（错位一根的标记价比没有更糟，它看起来是对的）。
+
+标记价在某个时刻缺根时 `v.MarkPx()` 返回 **NaN**，`simbar.WithMarkPx(NaN)` 等同于
+不设。想让缺标记价直接报错而不是静默退化，在记账内核那边打开
+`Config.RequireMarkPx`。
+
+> 指数价同理：`okxsource.IndexPrice` + `segfile.Index`，
+> instId 用现货形式（`ETH-USDT` 而不是 `ETH-USDT-SWAP`）。
+> 它给 `triggerPxType` 为 index 的算法委托用。
+>
+> 标记价与指数价**没有成交量**，那三个字段恒为 0。
+
 ## 持久化：目录由你指定
 
 默认实现 `store/segfile` 是定长记录文件，零第三方依赖。**落盘位置完全由使用者
@@ -258,18 +303,32 @@ store.Path("BTC-USDT-SWAP", "15m")  // 这条序列的 .dat / .meta 在哪
 
 ```
 <root>/
-  .lock                    写锁
-  candles/                 K 线的命名空间
+  candles/                 成交价 K 线
+    .lock                  写锁（在命名空间之内）
     BTC-USDT-SWAP/
       15m.dat              纯定长记录数组，无文件头，offset = i * 64
       15m.meta             JSON，人可读
-    ETH-USDT-SWAP/
-      1H.dat
-      1H.meta
+  mark-candles/            标记价 K 线
+    .lock
+    BTC-USDT-SWAP/
+      15m.dat
+      15m.meta
+  index-candles/           指数价 K 线
 ```
 
-`candles/` 那一层是给以后留位的：逐笔成交、盘口深度是形态完全不同的数据，
-将来要放进来时不必迁移已有的 K 线。
+```go
+segfile.Open(root)                 // candles/
+segfile.Open(root, segfile.Mark)   // mark-candles/
+segfile.Open(root, segfile.Index)  // index-candles/
+```
+
+标记价的 `BTC-USDT-SWAP/15m` 与成交价的 `BTC-USDT-SWAP/15m` 是**两条不同的
+序列，同一个 `(instId, bar)` 键**。用命名空间分开，而不是拼一个
+`BTC-USDT-SWAP:mark` 之类的合成 instId——合成键会渗进 `Meta`、`Coverage`、
+`SeriesID`，以后再拆就是破坏性变更。
+
+**写锁也在命名空间之内**，所以同一进程里同时开一个成交价 Store 和一个标记价
+Store 不会自己把自己锁住。
 
 一条记录 **64 字节**（小端）：`ts int64` + `open high low close vol volCcy
 volCcyQuote` 七个 float64。1m 线一年约 33.6MB，五年约 168MB 单文件。
@@ -397,9 +456,11 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 
 ## 已知的空白
 
-不是遗漏，是知道而暂时没有的：**标记价与指数价拿不到**（上游 SDK 还没有这两个
-端点）、**2D / 3D 的锚点是推定的**（实测对上了，但 OKX 未文档化）。
+不是遗漏，是知道而暂时没有的：**2D / 3D 的锚点是推定的**（实测对上了，
+但 OKX 未文档化，真出问题时 `SyncReport.Misaligned` 会不为零）。
 详见 [docs/design.md](docs/design.md) 的「已知的空白」。
+
+（标记价与指数价此前也在这张单子上，v1.2.0 已经补齐。）
 
 ### 竞态检测
 
@@ -426,5 +487,6 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 | v0.5 | ✅ `adapter/simbar`——与记账内核对接，三库端到端跑通 |
 | v1.0 | ✅ API 收口、根包文档、两年真实数据端到端验收 |
 | v1.1 | ✅ 默认口径改为 CN——实测确认 OKX 平台用的就是这一套 |
+| v1.2 | ✅ 标记价 / 指数价序列，命名空间分离，Feed 锁步对齐 |
 
 设计取舍与理由见 [docs/design.md](docs/design.md)。
