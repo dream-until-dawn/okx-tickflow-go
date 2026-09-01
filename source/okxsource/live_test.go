@@ -251,3 +251,81 @@ func TestLiveMarkAndIndexCandles(t *testing.T) {
 			"成交价 %.6f，标记价 %.6f", sumT/float64(paired), sumM/float64(paired))
 	}
 }
+
+// TestLiveMarkPriceHistoryFloor 量出标记价历史那条硬线。
+//
+// 这一条一度被写成「标记价与普通 K 线同深」——那是错的，而错误的来源值得记下来：
+// 最初的测量是在【模拟盘】上做的，模拟盘的两条序列在同一天一起截断（那是模拟盘
+// 自己的数据上限），于是「一起返回空」被读成了「一样深」，实际是「一样测不到」。
+//
+// 生产环境上标记价有一条硬线。它对「回测能从哪天开始」是硬约束：早于这条线的
+// 区间标记价根本不存在，此时打开记账内核的 AllowMarkPxFallback 是【正当的】，
+// 而不是将就。
+func TestLiveMarkPriceHistoryFloor(t *testing.T) {
+	trades := liveSource(t)
+	mark, err := okxsource.New(liveClient(t), okxsource.MarkPrice)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := tickflow.MustParsePeriod("1D")
+	from := time.Date(2015, 1, 1, 0, 0, 0, 0, time.UTC).UnixMilli()
+	to := p.Truncate(time.Now().UnixMilli())
+	ctx := context.Background()
+	hk := time.FixedZone("HKT", 8*3600)
+
+	earliest := func(src *okxsource.Source, inst string) int64 {
+		t.Helper()
+		cs, err := src.Fetch(ctx, tickflow.FetchRequest{
+			InstID: inst, Bar: "1D", From: from, To: to,
+		})
+		if err != nil {
+			t.Fatalf("%s %s: %v", inst, src.Series(), err)
+		}
+		if len(cs) == 0 {
+			t.Fatalf("%s %s 一根都没拉到", inst, src.Series())
+		}
+		return cs[0].Ts
+	}
+
+	// 这条线是【港时】的——1D 按港时对齐，UTC 2019-12-31 16:00 开盘那根就是港时
+	// 2020-01-01。用 1Dutc 的人看到的日期会不一样。
+	floorHK := "2020-01-01"
+
+	var older, sameDepth int
+	for _, inst := range []string{
+		"BTC-USDT-SWAP", "ETH-USDT-SWAP", "BTC-USD-SWAP",
+		"SOL-USDT-SWAP", "DOGE-USDT-SWAP",
+	} {
+		tTs, mTs := earliest(trades, inst), earliest(mark, inst)
+		tDay := time.UnixMilli(tTs).In(hk).Format("2006-01-02")
+		mDay := time.UnixMilli(mTs).In(hk).Format("2006-01-02")
+		gap := (mTs - tTs) / 86400000
+
+		t.Logf("%-16s 成交价 %s  标记价 %s  差 %d 天", inst, tDay, mDay, gap)
+
+		if mTs < tTs {
+			t.Errorf("%s 的标记价比成交价还早，与已知的形态不符", inst)
+		}
+		if gap == 0 {
+			sameDepth++
+			// 同深的合约必然是在硬线【之后】上线的。
+			if tDay < floorHK {
+				t.Errorf("%s 上线于 %s（早于 %s）却与标记价同深——硬线的说法要重验",
+					inst, tDay, floorHK)
+			}
+			continue
+		}
+		older++
+		// 有差距的，标记价必须恰好停在硬线上。
+		if mDay != floorHK {
+			t.Errorf("%s 的标记价起点是 %s，不是预期的硬线 %s——"+
+				"这条线是观察结论不是官方承诺，变了就该改文档", inst, mDay, floorHK)
+		}
+	}
+
+	if older == 0 || sameDepth == 0 {
+		t.Fatalf("样本没覆盖两种情形（比硬线早的 %d 个、同深的 %d 个），这个测试说明不了什么",
+			older, sameDepth)
+	}
+}

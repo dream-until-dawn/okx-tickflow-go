@@ -305,9 +305,20 @@ step, err := simbar.Advance(sim, inst, v)   // 视图有标记价就自动带上
 > **记账内核 okx-position-simulator-go 从 v1.0.0 起默认【拒绝】缺标记价的 Bar**
 > ——不再静默退回成交价。确实拿不到数据时才打开它的
 > `Config.AllowMarkPxFallback`，打开就是接受这份偏差。
->
-> 而据它实测，**标记价历史与普通 K 线同深**：取得到普通 K 线就一定取得到标记价。
-> 所以这个降级完全可避免，没有理由不拉。
+
+### ⚠️ 标记价的历史硬线：港时 2020-01-01
+
+标记价历史**不如成交价长**。生产环境实测：`BTC-USDT-SWAP` 差 34 天、
+`ETH-USDT-SWAP` 差 32 天、`BTC-USD-SWAP` 差 **379 天**；而 2020 年之后上线的
+（SOL、DOGE）两条同深。
+
+规律是硬线之后上线的合约同深，之前上线的标记价一律被截到港时 `2020-01-01`。
+**从合约上线跑全历史的人一定会撞上。**
+
+回测起点早于这条线时，标记价根本不存在——那时打开 `AllowMarkPxFallback` 是
+**正当的**，不是将就。详见 [contract.md](docs/contract.md) 的「标记价的历史硬线」，
+那里也记着这条结论一度被搞错的原因（在模拟盘上测的，两条序列一起截断，
+「一起取不到」被读成了「一样深」）。
 
 > 指数价同理：`okxsource.IndexPrice` + `segfile.Index`，
 > instId 用现货形式（`ETH-USDT` 而不是 `ETH-USDT-SWAP`）。
