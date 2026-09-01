@@ -395,6 +395,14 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 > 嵌套模块的代价：仓库根目录的 `go build ./...` 与 `go test ./...` 覆盖不到它，
 > 要单独 `cd adapter/simbar` 执行。
 
+## 已知的空白
+
+不是遗漏，是知道而暂时没有的：**竞态检测没跑过**（开发机没有 cgo，
+`go test -race` 跑不起来，`segfile` 的并发安全靠代码审读而非工具验证）、
+**标记价与指数价拿不到**（上游 SDK 还没有这两个端点）、
+**2D / 3D 的锚点是推定的**（实测对上了，但 OKX 未文档化）。
+详见 [docs/design.md](docs/design.md) 的「已知的空白」。
+
 ## 排期
 
 | 版本 | 内容 |
