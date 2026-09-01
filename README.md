@@ -207,15 +207,39 @@ ts 必须严格递增且对齐，重复与乱序推送会报错——实盘里�
 `v.At(handle)` 1.7ns、`v.Ind("name")` 10.6ns、`v.Prev(3).Close()` 3.8ns。
 `View` 是「一个指针加一个下标」的值类型，`Prev(n)` 只是把下标往回挪。
 
-## 存储格式
+## 持久化：目录由你指定
 
-默认实现 `store/segfile` 是定长记录文件，零第三方依赖：
+默认实现 `store/segfile` 是定长记录文件，零第三方依赖。**落盘位置完全由使用者
+指定,库里没有任何默认路径**（空字符串直接报错，不猜）：
+
+```go
+store, err := segfile.Open("D:/quant/data")     // 写模式，取排他写锁
+store, err := segfile.OpenReadOnly("D:/quant/data")  // 只读，不取锁
+defer store.Close()
+
+store.Root()                    // 绝对路径，供打日志
+store.Path("BTC-USDT-SWAP", "15m")  // 这条序列的 .dat / .meta 在哪
+```
+
+绝对路径、相对路径、尚未创建的多层目录、带空格或中文的路径都可以。**相对路径在
+`Open` 时就换算成绝对路径**——之后程序 `os.Chdir` 不会让同一个 Store 指向别处。
+
+### 目录结构
 
 ```
-data/BTC-USDT-SWAP/
-  15m.dat     纯定长记录数组，无文件头，offset = i * 64
-  15m.meta    JSON，人可读
+<root>/
+  .lock                    写锁
+  candles/                 K 线的命名空间
+    BTC-USDT-SWAP/
+      15m.dat              纯定长记录数组，无文件头，offset = i * 64
+      15m.meta             JSON，人可读
+    ETH-USDT-SWAP/
+      1H.dat
+      1H.meta
 ```
+
+`candles/` 那一层是给以后留位的：逐笔成交、盘口深度是形态完全不同的数据，
+将来要放进来时不必迁移已有的 K 线。
 
 一条记录 **64 字节**（小端）：`ts int64` + `open high low close vol volCcy
 volCcyQuote` 七个 float64。1m 线一年约 33.6MB，五年约 168MB 单文件。
@@ -224,7 +248,45 @@ volCcyQuote` 七个 float64。1m 线一年约 33.6MB，五年约 168MB 单文件
 而小币种的 1m 线空洞可能很多；且 `1M` 不定长，除不出槽位号。回测是顺序读，
 二分只在起点发生一次。
 
-`Store` 是接口，想接 ClickHouse、SQLite 之类自行实现即可。
+### 并发：一个写者，多个读者
+
+进程内多读单写。跨进程靠 `Open` 时取的**写锁**：一个数据目录同一时刻只能有
+一个写者，第二个 `Open` 当场返回 `ErrLocked`，错误信息里带着占用者的 pid、
+主机名和占用时刻——而不是默默把文件写坏。同一进程里对同一目录 `Open` 两次
+同样被挡下（两个 Store 各有各的内存锁，它们之间并不互斥）。
+
+进程崩溃会遗留锁文件。本库**不去猜那个进程是否还活着**——跨平台可靠地判断
+这件事要引入平台相关的依赖。确认无人使用后 `segfile.ForceUnlock(root)` 清掉。
+
+`OpenReadOnly` 不取锁，可以和写者并存，读到的是**打开那一刻的快照**。这正是
+「同步守护进程持续追加 + 回测进程并发读」这个场景，`examples/feed` 与
+`examples/indicators` 都是这么打开的。
+
+> ⚠️ **Windows 上有一条实测出来的限制**：只读端持有某条序列时，写者**回填不了
+> 那条序列**。回填要把整个文件换掉（写临时文件再改名），而 Windows 的
+> `MoveFileEx` 在目标被任何句柄打开时一律失败——实测与 `FILE_SHARE_DELETE`
+> 无关，加了也没用，所以本库没有为此写平台特化代码。
+>
+> **追加不受影响**（按偏移写，不改名），所以日常同步与并发读完全正常；
+> 只有**深度回填**需要先让读者退出。回填失败时数据原封未动，序列继续可用。
+> Unix 上没有这个限制。
+
+### 换掉它
+
+`Store` 是接口，想接 ClickHouse、SQLite 之类自行实现即可：
+
+```go
+type Store interface {
+    Append(instID, bar string, cs []Candle) error   // 末尾追加，快路径
+    Merge(instID, bar string, cs []Candle) error    // 任意位置，回填走这条
+    Iter(instID, bar string, from, to int64) (Iterator, error)
+    Range(instID, bar string, from, to int64) ([]Candle, error)
+    Meta(instID, bar string) (Meta, error)
+    AddCoverage(instID, bar string, r Range) error
+    Series() ([]SeriesID, error)
+    Close() error
+}
+```
 
 ## 实测记录
 

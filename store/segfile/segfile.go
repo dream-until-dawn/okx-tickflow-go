@@ -10,10 +10,20 @@
 //
 // # 布局
 //
-//	root/
-//	  BTC-USDT-SWAP/
-//	    1m.dat     纯定长记录数组，【无文件头】，offset = i * 64
-//	    1m.meta    JSON，人可读
+// 根目录由使用者指定，本库没有默认路径：
+//
+//	<root>/
+//	  .lock                        写锁，见 Open
+//	  candles/                     K 线的命名空间
+//	    BTC-USDT-SWAP/
+//	      1m.dat                   纯定长记录数组，【无文件头】，offset = i * 64
+//	      1m.meta                  JSON，人可读
+//	    ETH-USDT-SWAP/
+//	      15m.dat
+//	      15m.meta
+//
+// candles 那一层是给以后留位的：逐笔成交、盘口深度是形态完全不同的数据，
+// 将来要放进来时不必迁移已有的 K 线。
 //
 // .dat 不放文件头，就是纯粹的记录数组——这样 offset = i*64 不用加偏移，
 // 二分与随机访问都最干净。magic / version / recordSize 全放 .meta。
@@ -62,29 +72,237 @@ const (
 
 	// blockRecords 是遍历时单次读取的记录数（64KB 一块）。
 	blockRecords = 1024
+
+	// candlesDir 是 K 线在数据目录下的命名空间。
+	//
+	// 多这一层是给以后留位：逐笔成交、盘口深度都是形态完全不同的数据，
+	// 将来要放进来时不必迁移已有的 K 线。现在多一个空目录，比以后动全部人的
+	// 数据便宜得多。
+	candlesDir = "candles"
+
+	// lockFile 是写锁文件名，见 Open 的说明。
+	lockFile = ".lock"
 )
+
+// ErrReadOnly 表示在只读 Store 上尝试了写操作。
+var ErrReadOnly = errors.New("segfile: 只读模式下不能写入")
+
+// ErrLocked 表示数据目录已被另一个写者占用。
+var ErrLocked = errors.New("segfile: 数据目录已被占用")
 
 // Store 是 tickflow.Store 的定长文件实现。
 //
-// 并发：进程内安全，多读单写。跨进程写同一份数据【不受保护】——那本就该由
-// 使用者规避，一个库无法在所有平台上可靠地做到这点。
+// # 数据目录
+//
+// 落盘位置【完全由使用者指定】，本库没有任何默认路径。绝对路径、相对路径、
+// 尚未创建的多层目录都可以；相对路径在 Open 时就换算成绝对路径，之后程序
+// 再 os.Chdir 也不会让同一个 Store 指向别处。
+//
+// # 并发
+//
+// 进程内多读单写，由读写锁保证。跨进程靠 Open 时取的【写锁】：一个数据目录
+// 同一时刻只能有一个写者，第二个 Open 当场报 ErrLocked，而不是默默把文件写坏。
+// 同一进程里对同一目录 Open 两次同样会被挡下——两个 Store 各有各的内存锁，
+// 它们之间并不互斥，危险程度和两个进程一样。
+//
+// 只读用 OpenReadOnly，它【不取锁】，可以与写者并存。读到的是打开那一刻的
+// 快照：写者随后追加的数据要重新打开才看得到。追加只往文件尾写，读者按自己
+// meta 里认的条数读，因此始终读到一份完整的旧快照。
+//
+// ⚠️ Windows 上有一条真实的限制：只读端持有某条序列时，写者【回填不了那条
+// 序列】。回填走的是「写临时文件再改名」，而 Windows 的 MoveFileEx 在目标
+// 被任何句柄打开时一律失败（实测与 FILE_SHARE_DELETE 无关，加了也没用），
+// 于是 Merge 会报 Access denied。追加不受影响——它是按偏移写，不改名。
+//
+// 也就是说：「同步守护进程持续追加最新 K 线 + 回测进程并发读」在 Windows 上
+// 完全正常；只有【深度回填】需要先让读者退出。Unix 上没有这个限制，改名不受
+// 已打开的句柄影响。
 type Store struct {
-	root string
+	root     string
+	readOnly bool
+	locked   bool
 
 	mu     sync.Mutex
 	series map[string]*series
 	closed bool
 }
 
-// Open 打开（必要时创建）一个位于 root 的存储。
+// Open 以【写模式】打开（必要时创建）位于 root 的存储，并取得排他写锁。
+//
+// root 已被另一个写者占用时返回 ErrLocked，错误信息里带着占用者的进程号、
+// 主机名与占用时刻。进程崩溃会遗留陈旧的锁文件——本库【不去猜那个进程是否
+// 还活着】：跨平台可靠地判断这件事需要平台相关的依赖，而本库刻意不引入。
+// 确认无人使用后用 ForceUnlock 清掉即可。
 func Open(root string) (*Store, error) {
+	s, err := newStore(root, false)
+	if err != nil {
+		return nil, err
+	}
+	if err := s.acquire(); err != nil {
+		return nil, err
+	}
+	return s, nil
+}
+
+// OpenReadOnly 以只读模式打开位于 root 的存储。不取锁，可与写者并存。
+//
+// 所有写操作返回 ErrReadOnly。看到的是打开那一刻的快照。
+func OpenReadOnly(root string) (*Store, error) { return newStore(root, true) }
+
+func newStore(root string, readOnly bool) (*Store, error) {
 	if root == "" {
 		return nil, errors.New("segfile: root 不能为空")
 	}
-	if err := os.MkdirAll(root, 0o755); err != nil {
-		return nil, fmt.Errorf("segfile: 创建 %s 失败: %w", root, err)
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return nil, fmt.Errorf("segfile: 解析 %s 失败: %w", root, err)
 	}
-	return &Store{root: root, series: map[string]*series{}}, nil
+	if readOnly {
+		if _, err := os.Stat(abs); err != nil {
+			return nil, fmt.Errorf("segfile: 只读打开 %s 失败: %w", abs, err)
+		}
+	} else if err := os.MkdirAll(filepath.Join(abs, candlesDir), 0o755); err != nil {
+		return nil, fmt.Errorf("segfile: 创建 %s 失败: %w", abs, err)
+	}
+	if err := checkLegacyLayout(abs); err != nil {
+		return nil, err
+	}
+	return &Store{root: abs, readOnly: readOnly, series: map[string]*series{}}, nil
+}
+
+// Root 返回数据目录的绝对路径，供日志与诊断使用。
+func (s *Store) Root() string { return s.root }
+
+// ReadOnly 报告本 Store 是否为只读。
+func (s *Store) ReadOnly() bool { return s.readOnly }
+
+// Path 返回某条序列的两个文件路径，供诊断、备份或手工检查使用。
+// 文件不一定已经存在。
+func (s *Store) Path(instID, bar string) (dat, meta string, err error) {
+	if err := validName(instID, "instId"); err != nil {
+		return "", "", err
+	}
+	if err := validName(bar, "bar"); err != nil {
+		return "", "", err
+	}
+	dir := filepath.Join(s.root, candlesDir, instID)
+	return filepath.Join(dir, bar+".dat"), filepath.Join(dir, bar+".meta"), nil
+}
+
+// ---------------------------------------------------------------- 写锁
+
+// lockInfo 记在锁文件里，纯粹是给人看的诊断信息。
+type lockInfo struct {
+	PID   int    `json:"pid"`
+	Host  string `json:"host"`
+	Since string `json:"since"`
+	Root  string `json:"root"`
+}
+
+func (s *Store) lockPath() string { return filepath.Join(s.root, lockFile) }
+
+func (s *Store) acquire() error {
+	path := s.lockPath()
+	f, err := os.OpenFile(path, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0o644)
+	if err != nil {
+		if !errors.Is(err, os.ErrExist) {
+			return fmt.Errorf("segfile: 建立写锁 %s 失败: %w", path, err)
+		}
+		return fmt.Errorf("%w: %s（%s）。若确认那个进程已经退出，"+
+			"调 segfile.ForceUnlock 清掉，或直接删除 %s",
+			ErrLocked, s.root, describeLock(path), path)
+	}
+	host, _ := os.Hostname()
+	raw, _ := json.MarshalIndent(lockInfo{
+		PID: os.Getpid(), Host: host,
+		Since: time.Now().Format(time.RFC3339), Root: s.root,
+	}, "", "  ")
+	_, werr := f.Write(append(raw, '\n'))
+	cerr := f.Close()
+	if werr != nil || cerr != nil {
+		os.Remove(path)
+		if werr != nil {
+			return werr
+		}
+		return cerr
+	}
+	s.locked = true
+	return nil
+}
+
+func (s *Store) release() {
+	if !s.locked {
+		return
+	}
+	os.Remove(s.lockPath())
+	s.locked = false
+}
+
+// describeLock 把锁文件里的信息读成一句人话。读不出来也不要紧，锁本身仍然生效。
+func describeLock(path string) string {
+	raw, err := os.ReadFile(path)
+	if err != nil {
+		return "锁文件存在但读不出内容"
+	}
+	var li lockInfo
+	if json.Unmarshal(raw, &li) != nil || li.PID == 0 {
+		return "锁文件内容无法解析"
+	}
+	return fmt.Sprintf("持有者 pid=%d host=%s 自 %s 起", li.PID, li.Host, li.Since)
+}
+
+// ForceUnlock 强行清掉 root 上的写锁。
+//
+// 只在【确认没有任何进程正在写】这个目录时使用——进程崩溃会遗留锁文件，
+// 这是它存在的唯一理由。在写者仍活着时调用它，等于把两个写者放进同一个目录。
+func ForceUnlock(root string) error {
+	abs, err := filepath.Abs(root)
+	if err != nil {
+		return err
+	}
+	if err := os.Remove(filepath.Join(abs, lockFile)); err != nil && !errors.Is(err, os.ErrNotExist) {
+		return err
+	}
+	return nil
+}
+
+// checkLegacyLayout 挡住「数据还在旧布局里」这种情况。
+//
+// v0.3 及之前把序列直接放在 <root>/<instId>/ 下，v0.4 起挪进了
+// <root>/candles/<instId>/。不检查的话，指着旧目录打开会得到一个空库，
+// 而旧数据就在旁边躺着——这种「数据凭空消失」最难查。
+func checkLegacyLayout(root string) error {
+	dirs, err := os.ReadDir(root)
+	if err != nil {
+		return nil // 目录还不存在或读不了，交给后续流程报错
+	}
+	for _, d := range dirs {
+		if !d.IsDir() || d.Name() == candlesDir {
+			continue
+		}
+		files, err := os.ReadDir(filepath.Join(root, d.Name()))
+		if err != nil {
+			continue
+		}
+		for _, f := range files {
+			if !strings.HasSuffix(f.Name(), ".meta") {
+				continue
+			}
+			raw, err := os.ReadFile(filepath.Join(root, d.Name(), f.Name()))
+			if err != nil {
+				continue
+			}
+			var m tickflow.Meta
+			if json.Unmarshal(raw, &m) == nil && m.Magic == Magic {
+				return fmt.Errorf("segfile: %s 下的数据还在旧布局里（v0.3 及之前直接放在 "+
+					"<root>/<instId>/），v0.4 起挪到了 <root>/%s/<instId>/。"+
+					"把 %s 这样的目录整个移进 %s 即可，文件本身不用动",
+					root, candlesDir,
+					filepath.Join(root, d.Name()), filepath.Join(root, candlesDir))
+			}
+		}
+	}
+	return nil
 }
 
 var _ tickflow.Store = (*Store)(nil)
@@ -103,6 +321,7 @@ func (s *Store) Close() error {
 		}
 	}
 	s.series = nil
+	s.release()
 	return firstErr
 }
 
@@ -124,7 +343,7 @@ func (s *Store) get(instID, bar string, create bool) (*series, error) {
 	if se, ok := s.series[key]; ok {
 		return se, nil
 	}
-	se, err := openSeries(filepath.Join(s.root, instID), instID, bar, create)
+	se, err := openSeries(filepath.Join(s.root, candlesDir, instID), instID, bar, create, s.readOnly)
 	if err != nil {
 		return nil, err
 	}
@@ -136,6 +355,9 @@ func (s *Store) Append(instID, bar string, cs []tickflow.Candle) error {
 	if len(cs) == 0 {
 		return nil
 	}
+	if s.readOnly {
+		return ErrReadOnly
+	}
 	se, err := s.get(instID, bar, true)
 	if err != nil {
 		return err
@@ -146,6 +368,9 @@ func (s *Store) Append(instID, bar string, cs []tickflow.Candle) error {
 func (s *Store) Merge(instID, bar string, cs []tickflow.Candle) error {
 	if len(cs) == 0 {
 		return nil
+	}
+	if s.readOnly {
+		return ErrReadOnly
 	}
 	se, err := s.get(instID, bar, true)
 	if err != nil {
@@ -167,6 +392,9 @@ func (s *Store) Meta(instID, bar string) (tickflow.Meta, error) {
 func (s *Store) AddCoverage(instID, bar string, r tickflow.Range) error {
 	if r.Empty() {
 		return nil
+	}
+	if s.readOnly {
+		return ErrReadOnly
 	}
 	se, err := s.get(instID, bar, true)
 	if err != nil {
@@ -200,7 +428,11 @@ func (s *Store) Range(instID, bar string, from, to int64) ([]tickflow.Candle, er
 }
 
 func (s *Store) Series() ([]tickflow.SeriesID, error) {
-	dirs, err := os.ReadDir(s.root)
+	base := filepath.Join(s.root, candlesDir)
+	dirs, err := os.ReadDir(base)
+	if errors.Is(err, os.ErrNotExist) {
+		return nil, nil
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -209,7 +441,7 @@ func (s *Store) Series() ([]tickflow.SeriesID, error) {
 		if !d.IsDir() {
 			continue
 		}
-		files, err := os.ReadDir(filepath.Join(s.root, d.Name()))
+		files, err := os.ReadDir(filepath.Join(base, d.Name()))
 		if err != nil {
 			return nil, err
 		}
@@ -242,7 +474,7 @@ type series struct {
 	gen uint64
 }
 
-func openSeries(dir, instID, bar string, create bool) (*series, error) {
+func openSeries(dir, instID, bar string, create, readOnly bool) (*series, error) {
 	se := &series{
 		dat:      filepath.Join(dir, bar+".dat"),
 		metaPath: filepath.Join(dir, bar+".meta"),
@@ -274,6 +506,13 @@ func openSeries(dir, instID, bar string, create bool) (*series, error) {
 		return nil, err
 	}
 
+	if readOnly {
+		if se.f, err = os.Open(se.dat); err != nil {
+			return nil, err
+		}
+		// 只读时不修文件，只核对一下并如实报告不一致。
+		return se, se.verify()
+	}
 	if err := os.MkdirAll(dir, 0o755); err != nil {
 		return nil, err
 	}
@@ -285,6 +524,22 @@ func openSeries(dir, instID, bar string, create bool) (*series, error) {
 		return nil, err
 	}
 	return se, nil
+}
+
+// verify 是 reconcile 的只读版本：发现不一致就报告，绝不改文件。
+//
+// 只读 Store 与写者并存时，数据比 meta 多是【正常】的——写者刚追加完数据、
+// 还没更新 meta。读者按自己 meta 里认的条数读，读到的仍是一份完整的旧快照。
+func (se *series) verify() error {
+	st, err := se.f.Stat()
+	if err != nil {
+		return err
+	}
+	if have := st.Size() / RecordSize; have < se.meta.Count {
+		return fmt.Errorf("segfile: %s 只有 %d 条记录，而 %s 声称有 %d 条",
+			se.dat, have, se.metaPath, se.meta.Count)
+	}
+	return nil
 }
 
 // reconcile 处理「写完数据、还没写 meta 就崩了」的残留。
@@ -485,8 +740,19 @@ func (se *series) merge(in []tickflow.Candle) error {
 		return err
 	}
 	se.f = nil
-	if err := os.Rename(tmp, se.dat); err != nil {
-		return fmt.Errorf("segfile: 替换 %s 失败: %w", se.dat, err)
+	if rerr := os.Rename(tmp, se.dat); rerr != nil {
+		// 改名失败时【数据文件原封未动】，这次回填等于没发生。把句柄接回去，
+		// 序列继续可用——否则一次可恢复的失败会让这条序列在本进程里彻底作废，
+		// 而使用者从错误信息上完全看不出这一点。
+		if f, oerr := os.OpenFile(se.dat, os.O_RDWR, 0o644); oerr == nil {
+			se.f = f
+		}
+		os.Remove(tmp)
+		return fmt.Errorf("segfile: 替换 %s 失败: %w；"+
+			"Windows 上这通常意味着有只读端正开着这条序列——"+
+			"回填要改名整个文件，而 MoveFileEx 在目标被打开时会失败。"+
+			"让读者先退出即可（追加不受此限制）。本次回填未生效，数据未改动",
+			se.dat, rerr)
 	}
 	if se.f, err = os.OpenFile(se.dat, os.O_RDWR, 0o644); err != nil {
 		return err
