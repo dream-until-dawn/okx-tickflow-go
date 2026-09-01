@@ -70,7 +70,7 @@ func TestHandComputed(t *testing.T) {
 
 	t.Run("EMA/TV", func(t *testing.T) {
 		// α = 2/(3+1) = 0.5，用前 3 根的简单平均（= 2）播种。
-		wantSeq(t, "ema3", col(t, EMA(3), up, 0), []float64{nan, nan, 2, 3, 4})
+		wantSeq(t, "ema3", col(t, EMA(3, TV), up, 0), []float64{nan, nan, 2, 3, 4})
 	})
 
 	t.Run("EMA/CN", func(t *testing.T) {
@@ -104,7 +104,7 @@ func TestHandComputed(t *testing.T) {
 	t.Run("RSI/TV", func(t *testing.T) {
 		// 涨跌幅：+1, -1, +2。n=2，前两个涨跌幅的简单平均播种。
 		// 播种后 均涨=0.5 均跌=0.5 → 50；再走一步 均涨=1.25 均跌=0.25 → 83.33
-		wantSeq(t, "rsi2", col(t, RSI(2), closes(10, 11, 10, 12), 0),
+		wantSeq(t, "rsi2", col(t, RSI(2, TV), closes(10, 11, 10, 12), 0),
 			[]float64{nan, nan, 50, 100 - 100.0/6})
 	})
 
@@ -134,7 +134,7 @@ func TestHandComputed(t *testing.T) {
 	t.Run("KDJ/TV", func(t *testing.T) {
 		// m1=m2=1 时简单平均是恒等的，K=D=RSV，J=3K-2D=RSV。
 		cs := hlc([3]float64{10, 8, 9}, [3]float64{12, 9, 11}, [3]float64{11, 7, 10})
-		rows := Compute(KDJ(3, 1, 1), cs)
+		rows := Compute(KDJ(3, 1, 1, TV), cs)
 		wantSeq(t, "kdj", []float64{rows[2][0], rows[2][1], rows[2][2]}, []float64{60, 60, 60})
 	})
 }
@@ -162,7 +162,7 @@ func TestMACDHistConvention(t *testing.T) {
 	// 播种差异是【暂时】的。EMA(26) 的初值影响按 (1-2/27)^k 衰减，走上几百根
 	//　之后两套口径的 dif 应当收敛到一起——剩下的差别就只有柱子的倍数了。
 	// 这条不成立就说明播种以外还混进了别的分歧。
-	tv := Compute(MACD(12, 26, 9), cs)
+	tv := Compute(MACD(12, 26, 9, TV), cs)
 	cn := Compute(MACD(12, 26, 9, CN), cs)
 	last := len(cs) - 1
 	if d := math.Abs(tv[last][0] - cn[last][0]); d > 1e-8 {
@@ -304,20 +304,21 @@ func TestNamingAndKeys(t *testing.T) {
 }
 
 func TestConventionSelection(t *testing.T) {
-	if got := MA(5).(*maIndicator).Convention(); got != TV {
-		t.Errorf("默认口径应当是 TV，实为 %s", got)
+	// 默认是 CN——OKX 自己的行情界面用的就是这一套，实测确认过。
+	if got := MA(5).(*maIndicator).Convention(); got != CN {
+		t.Errorf("默认口径应当是 CN，实为 %s", got)
 	}
-	if got := MA(5, CN).(*maIndicator).Convention(); got != CN {
-		t.Errorf("显式传 CN 未生效")
+	if got := MA(5, TV).(*maIndicator).Convention(); got != TV {
+		t.Errorf("显式传 TV 未生效")
 	}
 
-	SetDefaultConvention(CN)
-	defer SetDefaultConvention(TV)
-	if got := MA(5).(*maIndicator).Convention(); got != CN {
+	SetDefaultConvention(TV)
+	defer SetDefaultConvention(CN)
+	if got := MA(5).(*maIndicator).Convention(); got != TV {
 		t.Errorf("全局默认未生效")
 	}
 	// 显式传的要盖过全局默认。
-	if got := MA(5, TV).(*maIndicator).Convention(); got != TV {
+	if got := MA(5, CN).(*maIndicator).Convention(); got != CN {
 		t.Errorf("显式口径应当盖过全局默认")
 	}
 }

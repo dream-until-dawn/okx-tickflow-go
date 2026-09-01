@@ -6,7 +6,7 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v1.0。** 公开 API 已收口。两年真实数据端到端验收过：同步的根数精确到
+> **状态：v1.1。** 公开 API 已收口。指标默认口径与 OKX 平台一致（实测确认）。两年真实数据端到端验收过：同步的根数精确到
 > 个位、重跑零请求、自聚合与 OKX 官方逐位相同、11520 步里对辅周期做了 22974 次
 > 防未来函数检查零违规。详见 [docs/design.md](docs/design.md) 的「v1.0 验收」。
 
@@ -112,14 +112,24 @@ for it.Next() {
 go run ./examples/indicators -inst BTC-USDT-SWAP -bar 15m -root ./data
 ```
 
-### 两套口径，差异只有三处
+### 两套口径，默认与 OKX 一致
 
-同一个指标名，TradingView 与国内行情软件算出来的数不一样。默认 TV，构造时可换：
+同一个指标名，TradingView 与国内行情软件算出来的数不一样。
+
+**默认是 CN 口径，因为 OKX 自己的行情界面用的就是这一套。** 2026-09-01 拿
+ETH-USDT-SWAP 的日线在 OKX 平台上逐行比对了 KDJ(9,3,3) 与 MACD(12,26,9)：
+CN 对得上，TV 对不上。那十行值已固化成回归测试（`indicator/okx_convention_test.go`），
+把一次人工核对变成了永久的守卫。
 
 ```go
-indicator.MACD(12, 26, 9, indicator.CN)      // 国内软件口径
-indicator.SetDefaultConvention(indicator.CN) // 或改全局默认
+indicator.MACD(12, 26, 9)                    // CN 口径（默认，与 OKX 一致）
+indicator.MACD(12, 26, 9, indicator.TV)      // TradingView 口径
+indicator.SetDefaultConvention(indicator.TV) // 或改全局默认
 ```
+
+> **v1.1.0 起默认由 TV 改为 CN。** 若你在 v1.0.0 上跑过、且没有显式指定口径，
+> MACD 的柱会变成原来的两倍、KDJ 的 K/D/J 会变——那不是回归，是默认值终于对上了
+> 交易所。想保持旧行为就显式传 `indicator.TV`。
 
 | 处 | TV | CN | 影响 |
 |---|---|---|---|
@@ -131,7 +141,9 @@ indicator.SetDefaultConvention(indicator.CN) // 或改全局默认
 **总体 `n`**（不是样本 `n−1`），两套口径都如此。
 
 播种那一条是**暂时**的：影响按 `(1−α)^k` 衰减。实测走满 5760 根 15m 之后，
-两套口径的 RSI(14) 已经完全相同；而柱子乘 2 和 KDJ 的平滑方式是**永久**差异。
+两套口径的 RSI(14) 已经完全相同，500 根日线之后 MACD 的 DIF/DEA 也完全相同；
+而柱子乘 2 和 KDJ 的平滑方式是**永久**差异——这也正是能用来判别 OKX 用哪套口径的
+两处。
 
 > TV 口径下的 **J 线是本库补的**——TradingView 的 Stochastic 没有 J 线，
 > 这里在两套口径下都按 `J = 3K − 2D` 给出，好让字段结构一致。
@@ -393,5 +405,6 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 | v0.4 | ✅ 数据目录、写锁与只读模式、`candles/` 命名空间 |
 | v0.5 | ✅ `adapter/simbar`——与记账内核对接，三库端到端跑通 |
 | v1.0 | ✅ API 收口、根包文档、两年真实数据端到端验收 |
+| v1.1 | ✅ 默认口径改为 CN——实测确认 OKX 平台用的就是这一套 |
 
 设计取舍与理由见 [docs/design.md](docs/design.md)。
