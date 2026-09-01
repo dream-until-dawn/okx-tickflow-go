@@ -49,17 +49,47 @@ func run(inst, bar, root string, cash, sz int64) error {
 	}
 	defer store.Close()
 
-	feed, err := tickflow.NewFeed(store, tickflow.FeedConfig{
-		InstID: inst, Base: bar, Extra: []string{"1D"},
+	// 标记价：有就用，没有就明说代价。
+	//
+	// 记账内核从 v1.0.0 起【默认拒绝】缺标记价的 Bar——强平判据用最新成交价会让
+	// 影线扫掉本不该爆的仓位，而且是假阴性。这里演示两条路都长什么样。
+	var (
+		markStore     tickflow.Store
+		allowFallback bool
+	)
+	if ms, err := segfile.OpenReadOnly(root, segfile.Mark); err == nil {
+		if _, err := ms.Meta(inst, bar); err == nil {
+			markStore = ms
+			defer ms.Close()
+		} else {
+			ms.Close()
+		}
+	}
+	if markStore == nil {
+		allowFallback = true
+		fmt.Printf("⚠️ 库里没有 %s/%s 的标记价，本次回测的强平判据将退回用最新成交价。\n"+
+			"   影线会制造出真实不会发生的强平，结果偏悲观且不留痕迹。先拉一份：\n"+
+			"   go run ./examples/sync -inst %s -bar %s -kind mark -root <你的目录>\n\n",
+			inst, bar, inst, bar)
+	}
+
+	// 主周期本身就是 1D 时不能再把 1D 当辅周期——辅周期必须【长于】主周期。
+	cfg := tickflow.FeedConfig{
+		InstID: inst, Base: bar,
 		Aggregate: true, Lookback: 2,
+		MarkStore: markStore,
 		Indicators: map[string][]tickflow.Indicator{
 			bar: {
 				indicator.MA(5, indicator.Named("fast")),
 				indicator.MA(20, indicator.Named("slow")),
 			},
-			"1D": {indicator.MA(5, indicator.Named("ma5d"))},
 		},
-	})
+	}
+	if bar != "1D" {
+		cfg.Extra = []string{"1D"}
+		cfg.Indicators["1D"] = []tickflow.Indicator{indicator.MA(5, indicator.Named("ma5d"))}
+	}
+	feed, err := tickflow.NewFeed(store, cfg)
 	if err != nil {
 		return err
 	}
@@ -78,6 +108,10 @@ func run(inst, bar, root string, cash, sz int64) error {
 		PosMode:      types.NetMode,
 		RefData:      refdata.MustEmbedded(), // 内置快照：回测要的是不可复现风险为零
 		DefaultLever: decimal.NewFromInt(5),
+
+		// 记账内核默认【拒绝】缺标记价的 Bar。只有确实拿不到时才打开这个开关——
+		// 打开它就是接受一次降级：强平判据会退回用最新成交价。
+		AllowMarkPxFallback: allowFallback,
 	})
 	if err != nil {
 		return err
@@ -163,6 +197,11 @@ func run(inst, bar, root string, cash, sz int64) error {
 
 	fmt.Printf("\n⚠️ 未计资金费——OKX 只保留约 3 个月历史，部分区间有比全都没有更糟。\n" +
 		"   这会系统性高估多头持仓的收益，解读上面的数字时请扣减。\n")
+	if allowFallback {
+		fmt.Printf("⚠️ 强平判据用的是最新成交价而非标记价，见开头那条。\n")
+	} else {
+		fmt.Printf("✓ 强平判据用的是真实标记价。\n")
+	}
 	return nil
 }
 

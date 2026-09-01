@@ -51,6 +51,10 @@ func TestThreeLibrariesCompose(t *testing.T) {
 		PosMode:      types.NetMode,
 		RefData:      refdata.MustEmbedded(),
 		DefaultLever: decimal.NewFromInt(5),
+		// 本测试验的是【三个库接得上】，不是标记价——夹具是 BTC 15m，没有配套的
+		// 标记价序列。显式声明接受降级，而不是让它默认报错。
+		// 标记价那条链的覆盖在 markpx_test.go，那里用的是真实的 ETH 日线两份数据。
+		AllowMarkPxFallback: true,
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -148,6 +152,8 @@ func TestAdvanceMatchesManualConversion(t *testing.T) {
 		sim, err := okxsim.New(okxsim.Config{
 			PosMode: types.NetMode, RefData: refdata.MustEmbedded(),
 			DefaultLever: decimal.NewFromInt(5),
+			// 同上：这里验的是 Advance 与手工转换等价，与标记价无关。
+			AllowMarkPxFallback: true,
 		})
 		if err != nil {
 			t.Fatal(err)

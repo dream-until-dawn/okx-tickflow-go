@@ -62,8 +62,11 @@ type Option func(*okxsim.Bar)
 //	bar, _ := simbar.ToBar(inst, v.Candle(), simbar.WithMarkPx(v.MarkPx()))
 //
 // px 为 NaN（标记价在这个时刻缺根）时【等同于不设】——Dec 把 NaN 转成零值，
-// 而记账内核只认正数的 MarkPx。想让缺标记价直接报错而不是静默退化，
-// 在记账内核那边打开 Config.RequireMarkPx。
+// 而记账内核只认正数的 MarkPx。
+//
+// 从 okx-position-simulator-go v1.0.0 起，**缺标记价是默认报错的**（字段反转成了
+// Config.AllowMarkPxFallback，打开它才退回用最新成交价顶替）。所以不给标记价
+// 不会静默出错，会当场炸——这是对的。
 func WithMarkPx(px float64) Option {
 	return func(b *okxsim.Bar) { b.MarkPx = Dec(px) }
 }
@@ -162,6 +165,14 @@ func ToBars(instID string, cs []tickflow.Candle, opts ...Option) ([]okxsim.Bar, 
 //	    ...
 //	}
 //
+// **视图带着标记价时会自动带上**（Feed 配了 FeedConfig.MarkStore 的话）。
+// 标记价 K 线与这一根同时收盘，本就是该用的那个值，不必让每个调用方都写一遍
+// WithMarkPx(v.MarkPx())。显式传的 WithMarkPx 会覆盖它。
+//
+// 视图没有标记价时不填——从 okx-position-simulator-go v1.0.0 起那会让 Advance
+// 直接报错（除非对方打开了 Config.AllowMarkPxFallback）。那是对的：强平判据用
+// 最新成交价会让影线扫掉本不该爆的仓位，而且是假阴性。
+//
 // 视图无效时返回错误而不是喂一根 NaN 进去。
 func Advance(sim *okxsim.Simulator, instID string, v tickflow.View, opts ...Option) (okxsim.StepResult, error) {
 	if sim == nil {
@@ -170,6 +181,10 @@ func Advance(sim *okxsim.Simulator, instID string, v tickflow.View, opts ...Opti
 	if !v.Valid() {
 		return okxsim.StepResult{}, fmt.Errorf("simbar: %s 的视图无效——"+
 			"Prev(n) 超出了 Lookback，或者还没走到第 n 根", instID)
+	}
+	// 视图知道自己这一根的标记价，自动带上；显式的 WithMarkPx 排在后面会覆盖它。
+	if px := v.MarkPx(); !math.IsNaN(px) {
+		opts = append([]Option{WithMarkPx(px)}, opts...)
 	}
 	b, err := ToBar(instID, v.Candle(), opts...)
 	if err != nil {
