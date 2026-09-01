@@ -24,12 +24,18 @@ func (r Range) Empty() bool { return r.To <= r.From }
 // Contains 报告 ts 是否落在区间内。
 func (r Range) Contains(ts int64) bool { return ts >= r.From && ts < r.To }
 
+// String 返回 "[from,to)" 形式，左闭右开一目了然。
 func (r Range) String() string { return fmt.Sprintf("[%d,%d)", r.From, r.To) }
 
+// MarshalJSON 把区间写成二元数组 [from, to]。
+//
+// 用数组而不是对象，是因为 meta 文件里可能有一长串区间，写成对象会长得读不动。
+// 这是落盘格式的一部分，改了就读不了旧的 meta 文件。
 func (r Range) MarshalJSON() ([]byte, error) {
 	return json.Marshal([2]int64{r.From, r.To})
 }
 
+// UnmarshalJSON 解析 [from, to] 形式的二元数组。
 func (r *Range) UnmarshalJSON(b []byte) error {
 	var a [2]int64
 	if err := json.Unmarshal(b, &a); err != nil {
@@ -135,6 +141,7 @@ type SeriesID struct {
 	Bar    string
 }
 
+// String 返回 "instId/bar"，如 "BTC-USDT-SWAP/15m"。
 func (s SeriesID) String() string { return s.InstID + "/" + s.Bar }
 
 // Iterator 按时间升序遍历一段 K 线。

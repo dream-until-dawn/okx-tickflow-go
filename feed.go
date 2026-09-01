@@ -575,15 +575,23 @@ func (v View) Candle() Candle {
 // Ts 返回开盘时间（毫秒）；视图无效时返回 0。
 func (v View) Ts() int64 { return v.Candle().Ts }
 
-// Open / High / Low / Close / Vol 取行情值；视图无效时返回 NaN。
+// Open 返回开盘价；视图无效时返回 NaN。
 //
-// 返回 NaN 而不是 0：0 是个看起来正常的价格，NaN 会沿运算传染，
+// 五个取值器都返回 NaN 而不是 0：0 是个看起来正常的价格，NaN 会沿运算传染，
 // 把「用了一根不存在的 K 线」这件事当场暴露出来。
-func (v View) Open() float64  { return v.px(func(c Candle) float64 { return c.Open }) }
-func (v View) High() float64  { return v.px(func(c Candle) float64 { return c.High }) }
-func (v View) Low() float64   { return v.px(func(c Candle) float64 { return c.Low }) }
+func (v View) Open() float64 { return v.px(func(c Candle) float64 { return c.Open }) }
+
+// High 返回最高价；视图无效时返回 NaN。
+func (v View) High() float64 { return v.px(func(c Candle) float64 { return c.High }) }
+
+// Low 返回最低价；视图无效时返回 NaN。
+func (v View) Low() float64 { return v.px(func(c Candle) float64 { return c.Low }) }
+
+// Close 返回收盘价；视图无效时返回 NaN。
 func (v View) Close() float64 { return v.px(func(c Candle) float64 { return c.Close }) }
-func (v View) Vol() float64   { return v.px(func(c Candle) float64 { return c.Vol }) }
+
+// Vol 返回成交量；视图无效时返回 NaN。
+func (v View) Vol() float64 { return v.px(func(c Candle) float64 { return c.Vol }) }
 
 func (v View) px(get func(Candle) float64) float64 {
 	if !v.Valid() {

@@ -307,6 +307,8 @@ func checkLegacyLayout(root string) error {
 
 var _ tickflow.Store = (*Store)(nil)
 
+// Close 关掉全部已打开的序列，并释放写锁（只读 Store 本就没有锁）。
+// 重复调用是安全的。
 func (s *Store) Close() error {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -351,6 +353,11 @@ func (s *Store) get(instID, bar string, create bool) (*series, error) {
 	return se, nil
 }
 
+// Append 在序列末尾追加，实现 tickflow.Store。
+//
+// 要求 cs 按 ts 严格升序，且首根晚于当前 LastTs——不满足就报错并指向 Merge。
+// 这是同步最新数据的快路径：按偏移写，不改名，因此【不受只读端持有文件的影响】。
+// 只读 Store 上返回 ErrReadOnly。
 func (s *Store) Append(instID, bar string, cs []tickflow.Candle) error {
 	if len(cs) == 0 {
 		return nil
@@ -365,6 +372,11 @@ func (s *Store) Append(instID, bar string, cs []tickflow.Candle) error {
 	return se.append(cs)
 }
 
+// Merge 把 cs 并入序列的任意位置，同 ts 以 cs 为准，实现 tickflow.Store。
+//
+// 代价是一次全文件重写（写临时文件再改名），所以【一整段回填要攒成一次调用】，
+// 分块多次调用会是 O(n²)。Windows 上只读端正持有该序列时会失败——见 Store 的
+// 说明；失败时数据原封未动，序列仍可用。只读 Store 上返回 ErrReadOnly。
 func (s *Store) Merge(instID, bar string, cs []tickflow.Candle) error {
 	if len(cs) == 0 {
 		return nil
@@ -379,6 +391,8 @@ func (s *Store) Merge(instID, bar string, cs []tickflow.Candle) error {
 	return se.merge(cs)
 }
 
+// Meta 返回序列的元信息，实现 tickflow.Store。
+// 序列不存在时返回 tickflow.ErrNoSeries。返回的是副本，改它不会影响存储。
 func (s *Store) Meta(instID, bar string) (tickflow.Meta, error) {
 	se, err := s.get(instID, bar, false)
 	if err != nil {
@@ -389,6 +403,10 @@ func (s *Store) Meta(instID, bar string) (tickflow.Meta, error) {
 	return se.meta.Clone(), nil
 }
 
+// AddCoverage 记录「[r.From, r.To) 这一段已请求并确认」，实现 tickflow.Store。
+//
+// 覆盖区间不能从数据推出来：一段区间里一根 K 线都没有，可能是 OKX 本就没产出，
+// 也可能是还没拉，只有发起请求的一方知道。只读 Store 上返回 ErrReadOnly。
 func (s *Store) AddCoverage(instID, bar string, r tickflow.Range) error {
 	if r.Empty() {
 		return nil
@@ -406,6 +424,11 @@ func (s *Store) AddCoverage(instID, bar string, r tickflow.Range) error {
 	return se.writeMeta()
 }
 
+// Iter 返回 [from, to) 的升序游标，实现 tickflow.Store。to 为 0 表示直到末尾。
+//
+// 起点用二分定位。遍历期间若该序列被 Merge 整体重写，游标会【报错而不是接着读】
+// ——那读到的是另一个位置上的数据。追加不影响已有下标，因此不会让游标失效。
+// 用完记得 Close。
 func (s *Store) Iter(instID, bar string, from, to int64) (tickflow.Iterator, error) {
 	se, err := s.get(instID, bar, false)
 	if err != nil {
@@ -414,6 +437,8 @@ func (s *Store) Iter(instID, bar string, from, to int64) (tickflow.Iterator, err
 	return se.iter(from, to)
 }
 
+// Range 是 Iter 的便捷包装，一次性读进内存，实现 tickflow.Store。
+// 大范围请用 Iter——五年的 1m 线有两百多万根。
 func (s *Store) Range(instID, bar string, from, to int64) ([]tickflow.Candle, error) {
 	it, err := s.Iter(instID, bar, from, to)
 	if err != nil {
@@ -427,6 +452,8 @@ func (s *Store) Range(instID, bar string, from, to int64) ([]tickflow.Candle, er
 	return out, it.Err()
 }
 
+// Series 列出数据目录里已存在的全部序列，按 instId、bar 排序，
+// 实现 tickflow.Store。目录为空时返回 nil 而不是错误。
 func (s *Store) Series() ([]tickflow.SeriesID, error) {
 	base := filepath.Join(s.root, candlesDir)
 	dirs, err := os.ReadDir(base)
