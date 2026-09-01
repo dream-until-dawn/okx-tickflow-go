@@ -1,6 +1,7 @@
 package tickflow
 
 import (
+	"strings"
 	"testing"
 	"time"
 )
@@ -169,4 +170,22 @@ func TestVerifyAlignment(t *testing.T) {
 	if got, ok := VerifyAlignment(p, bad); ok || got != ms(t, "2026-01-15T09:30:00Z") {
 		t.Errorf("应当报出 09:30 不对齐，实得 %s ok=%v", str(got), ok)
 	}
+}
+
+// TestZeroPeriodPanicsClearly：零值 Period 一定是编程错误。
+// 没有这个守卫的话，它会从 time 包深处炸出一句「missing Location」，
+// 与真正的病因隔着好几层。
+func TestZeroPeriodPanicsClearly(t *testing.T) {
+	defer func() {
+		r := recover()
+		if r == nil {
+			t.Fatal("零值 Period 应当 panic")
+		}
+		msg, _ := r.(string)
+		if !strings.Contains(msg, "ParsePeriod") {
+			t.Errorf("panic 信息该指出正确的构造方式，实为：%v", r)
+		}
+	}()
+	var p Period
+	p.Truncate(1767225600000)
 }

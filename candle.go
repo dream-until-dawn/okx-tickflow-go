@@ -10,7 +10,7 @@ import (
 //
 // OHLCV 用 float64 而非 decimal：指标计算是本库的热路径，decimal 会慢一到两个
 // 数量级，且没有任何精度收益——OKX 的价格位数远在 float64 的 15 位有效数字之内。
-// 与 okx-position-simulator-go 的 decimal 世界的转换收在 adapter/okxsim 一处。
+// 与 okx-position-simulator-go 的 decimal 世界的转换收在 adapter/simbar 一处。
 //
 // 未完结的 K 线（上游 Confirm == false）不会进入本库的任何一层，在 Source 那一层
 // 就已丢弃。用一根还在变的 K 线的「收盘价」做决策，等于偷看了这根 K 线走完之后
@@ -79,7 +79,14 @@ func (p Period) Fixed() bool { return p.step != 0 }
 func (p Period) Step() time.Duration { return time.Duration(p.step) * time.Millisecond }
 
 // Truncate 把任意时刻对齐到它所属那根 K 线的开盘时间。
+//
+// 零值 Period 会 panic：那一定是编程错误——Period 只能由 ParsePeriod 构造，
+// 拿一个零值去对齐时间，得到的任何结果都是错的。与其让它从 time 包深处炸出
+// 一句「missing Location」，不如在这里说清楚。
 func (p Period) Truncate(ts int64) int64 {
+	if p.IsZero() {
+		panic("tickflow: 用了一个零值 Period；Period 须由 ParsePeriod / MustParsePeriod 构造")
+	}
 	if p.step != 0 {
 		return p.anchor + floorDiv(ts-p.anchor, p.step)*p.step
 	}

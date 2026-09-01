@@ -15,8 +15,8 @@ import (
 // 用半截历史算出来的指标值。
 const warmupSlack = 2
 
-// Config 描述一个 Feed。
-type Config struct {
+// FeedConfig 描述一个 Feed。
+type FeedConfig struct {
 	InstID string
 
 	// Base 是【步进】的主周期。Next 每次前进一根主周期 K 线。
@@ -67,7 +67,7 @@ type Config struct {
 // 它是本库对回测引擎的主要接口，也是「防未来函数」这件事真正落地的地方，
 // 见 TF 的说明。
 //
-//	f, _ := tickflow.NewFeed(store, tickflow.Config{
+//	f, _ := tickflow.NewFeed(store, tickflow.FeedConfig{
 //	    InstID: "BTC-USDT-SWAP",
 //	    Base:   "15m",
 //	    Extra:  []string{"1H", "1D"},
@@ -117,7 +117,7 @@ type Feed struct {
 //
 // store 可以为 nil——此时 Next 立即返回 false，只能用 Push 手工喂数据。
 // 实盘接 WebSocket 时就这么用，指标与视图的代码和回测完全一样。
-func NewFeed(store Store, cfg Config) (*Feed, error) {
+func NewFeed(store Store, cfg FeedConfig) (*Feed, error) {
 	if cfg.InstID == "" {
 		return nil, errors.New("tickflow: Feed 的 instId 不能为空")
 	}
@@ -203,7 +203,7 @@ func NewFeed(store Store, cfg Config) (*Feed, error) {
 }
 
 // openIterators 按各周期各自的预热需求打开存储游标。
-func (f *Feed) openIterators(cfg Config) error {
+func (f *Feed) openIterators(cfg FeedConfig) error {
 	meta, err := f.store.Meta(f.inst, cfg.Base)
 	if err != nil {
 		return fmt.Errorf("tickflow: 读取 %s/%s 失败: %w", f.inst, cfg.Base, err)
@@ -252,7 +252,7 @@ func (f *Feed) openIterators(cfg Config) error {
 			// 辅周期没同步过是个常见错误，把话说明白。
 			if errors.Is(err, ErrNoSeries) {
 				return fmt.Errorf("tickflow: 辅周期 %s/%s 在库里不存在——"+
-					"先同步它，或者用 Config.Aggregate 从主周期聚合: %w", f.inst, s.bar, err)
+					"先同步它，或者用 FeedConfig.Aggregate 从主周期聚合: %w", f.inst, s.bar, err)
 			}
 			return err
 		}
@@ -556,7 +556,7 @@ func (v View) Bar() string {
 	return v.s.bar
 }
 
-// Prev 往回看 n 根。n 不能超过 Config.Lookback，否则得到无效视图。
+// Prev 往回看 n 根。n 不能超过 FeedConfig.Lookback，否则得到无效视图。
 func (v View) Prev(n int) View { return View{s: v.s, abs: v.abs - int64(n)} }
 
 // Ready 报告本周期的指标是否都已 warmup 完。
@@ -734,7 +734,7 @@ func checkNesting(base, high Period) error {
 	for i := 0; i < 64; i++ {
 		if base.Truncate(ts) != ts {
 			return fmt.Errorf("tickflow: %s 的边界 %d 没落在 %s 的网格上，无法聚合；"+
-				"关掉 Config.Aggregate 改为从库里读独立序列",
+				"关掉 FeedConfig.Aggregate 改为从库里读独立序列",
 				high.Bar(), ts, base.Bar())
 		}
 		ts = high.Next(ts)

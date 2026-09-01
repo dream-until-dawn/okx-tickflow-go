@@ -131,7 +131,7 @@ func TestTFNeverShowsUnclosedBar(t *testing.T) {
 	fill(t, st, "X", "1H", genBars(MustParsePeriod("1H"), start, 4*24))
 	fill(t, st, "X", "1D", genBars(MustParsePeriod("1D"), start, 6))
 
-	f, err := NewFeed(st, Config{
+	f, err := NewFeed(st, FeedConfig{
 		InstID: "X", Base: "15m", Extra: []string{"1H", "1D"},
 		From: m15[0].Ts, Lookback: 3,
 	})
@@ -190,7 +190,7 @@ func TestTFSpotCheck(t *testing.T) {
 	fill(t, st, "X", "15m", genBars(MustParsePeriod("15m"), start, 8*96))
 	fill(t, st, "X", "1D", genBars(d1, start, 10))
 
-	f, err := NewFeed(st, Config{
+	f, err := NewFeed(st, FeedConfig{
 		InstID: "X", Base: "15m", Extra: []string{"1D"},
 		From: ms(t, "2026-01-15T10:15:00Z"), To: ms(t, "2026-01-15T10:30:00Z"),
 	})
@@ -227,7 +227,7 @@ func TestAggregateMatchesStore(t *testing.T) {
 	fill(t, st, "X", "1H", aggregateBy(h1, m15))
 
 	collect := func(agg bool) []Candle {
-		f, err := NewFeed(st, Config{
+		f, err := NewFeed(st, FeedConfig{
 			InstID: "X", Base: "15m", Extra: []string{"1H"},
 			From: m15[0].Ts, Aggregate: agg,
 		})
@@ -298,7 +298,7 @@ func TestAggregateAcrossGap(t *testing.T) {
 	fill(t, st, "X", "15m", holed)
 
 	rec := &recorder{}
-	f, err := NewFeed(st, Config{
+	f, err := NewFeed(st, FeedConfig{
 		InstID: "X", Base: "15m", Extra: []string{"1H"},
 		From: holed[0].Ts, Aggregate: true, Lookback: 2,
 		Indicators: map[string][]Indicator{"1H": {rec}},
@@ -349,7 +349,7 @@ func TestLookbackAndPrev(t *testing.T) {
 	st := newMemStore()
 	fill(t, st, "X", "1H", cs)
 
-	f, err := NewFeed(st, Config{InstID: "X", Base: "1H", From: cs[0].Ts, Lookback: 3})
+	f, err := NewFeed(st, FeedConfig{InstID: "X", Base: "1H", From: cs[0].Ts, Lookback: 3})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -391,7 +391,7 @@ func TestIndicatorsInView(t *testing.T) {
 	st := newMemStore()
 	fill(t, st, "X", "1H", cs)
 
-	f, err := NewFeed(st, Config{
+	f, err := NewFeed(st, FeedConfig{
 		InstID: "X", Base: "1H", From: cs[30].Ts, Lookback: 2,
 		Indicators: map[string][]Indicator{
 			"1H": {newInd("one", 5), newInd("three", 5, "a", "b", "c")},
@@ -442,7 +442,7 @@ func TestHandleFromOtherTimeframe(t *testing.T) {
 	fill(t, fillSt, "X", "15m", genBars(base, start, 200))
 	fill(t, fillSt, "X", "1H", genBars(MustParsePeriod("1H"), start, 60))
 
-	f, err := NewFeed(fillSt, Config{
+	f, err := NewFeed(fillSt, FeedConfig{
 		InstID: "X", Base: "15m", Extra: []string{"1H"},
 		Indicators: map[string][]Indicator{
 			"15m": {newInd("x", 1)},
@@ -475,7 +475,7 @@ func TestWarmupAutoExtends(t *testing.T) {
 	fill(t, st, "X", "1H", cs)
 
 	mk := func(noWarm bool) bool {
-		f, err := NewFeed(st, Config{
+		f, err := NewFeed(st, FeedConfig{
 			InstID: "X", Base: "1H", From: cs[200].Ts, NoAutoWarmup: noWarm,
 			Indicators: map[string][]Indicator{"1H": {newInd("slow", 100)}},
 		})
@@ -504,7 +504,7 @@ func TestNoAutoWarmupStillEmitsNaN(t *testing.T) {
 	st := newMemStore()
 	fill(t, st, "X", "1H", cs)
 
-	f, err := NewFeed(st, Config{
+	f, err := NewFeed(st, FeedConfig{
 		InstID: "X", Base: "1H", From: cs[0].Ts, NoAutoWarmup: true,
 		Indicators: map[string][]Indicator{"1H": {newInd("w", 10)}},
 	})
@@ -538,7 +538,7 @@ func TestPushRealtime(t *testing.T) {
 	m15 := genBars(base, start, 20)
 
 	// store 为 nil：纯实盘形态，只靠 Push 驱动。
-	f, err := NewFeed(nil, Config{
+	f, err := NewFeed(nil, FeedConfig{
 		InstID: "X", Base: "15m", Extra: []string{"1H"}, Aggregate: true, Lookback: 2,
 		Indicators: map[string][]Indicator{"15m": {newInd("c", 1)}},
 	})
@@ -573,7 +573,7 @@ func TestPushRealtime(t *testing.T) {
 func TestPushValidation(t *testing.T) {
 	base := MustParsePeriod("15m")
 	cs := genBars(base, t0, 5)
-	f, err := NewFeed(nil, Config{InstID: "X", Base: "15m"})
+	f, err := NewFeed(nil, FeedConfig{InstID: "X", Base: "15m"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -609,25 +609,25 @@ func TestNewFeedValidation(t *testing.T) {
 
 	cases := []struct {
 		name string
-		cfg  Config
+		cfg  FeedConfig
 		want string
 	}{
-		{"缺 instId", Config{Base: "15m"}, "instId"},
-		{"缺主周期", Config{InstID: "X"}, "Base"},
-		{"未知主周期", Config{InstID: "X", Base: "7分钟"}, "未知周期"},
-		{"未知辅周期", Config{InstID: "X", Base: "15m", Extra: []string{"nope"}}, "未知周期"},
-		{"辅周期比主周期短", Config{InstID: "X", Base: "1H", Extra: []string{"15m"}}, "必须长于"},
-		{"辅周期与主周期同长", Config{InstID: "X", Base: "1H", Extra: []string{"1H"}}, "重复"},
-		{"负 Lookback", Config{InstID: "X", Base: "15m", Lookback: -1}, "Lookback"},
-		{"指标挂在陌生周期上", Config{
+		{"缺 instId", FeedConfig{Base: "15m"}, "instId"},
+		{"缺主周期", FeedConfig{InstID: "X"}, "Base"},
+		{"未知主周期", FeedConfig{InstID: "X", Base: "7分钟"}, "未知周期"},
+		{"未知辅周期", FeedConfig{InstID: "X", Base: "15m", Extra: []string{"nope"}}, "未知周期"},
+		{"辅周期比主周期短", FeedConfig{InstID: "X", Base: "1H", Extra: []string{"15m"}}, "必须长于"},
+		{"辅周期与主周期同长", FeedConfig{InstID: "X", Base: "1H", Extra: []string{"1H"}}, "重复"},
+		{"负 Lookback", FeedConfig{InstID: "X", Base: "15m", Lookback: -1}, "Lookback"},
+		{"指标挂在陌生周期上", FeedConfig{
 			InstID: "X", Base: "15m",
 			Indicators: map[string][]Indicator{"4H": {newInd("a", 1)}},
 		}, "既不是 Base"},
-		{"同周期上的指标重名", Config{
+		{"同周期上的指标重名", FeedConfig{
 			InstID: "X", Base: "15m",
 			Indicators: map[string][]Indicator{"15m": {newInd("dup", 1), newInd("dup", 1)}},
 		}, "都叫"},
-		{"聚合时周期不嵌套", Config{
+		{"聚合时周期不嵌套", FeedConfig{
 			InstID: "X", Base: "4H", Extra: []string{"6H"}, Aggregate: true,
 		}, "无法聚合"},
 	}
@@ -650,7 +650,7 @@ func TestMissingExtraSeriesSaysWhatToDo(t *testing.T) {
 	st := newMemStore()
 	fill(t, st, "X", "15m", genBars(MustParsePeriod("15m"), t0, 100))
 
-	_, err := NewFeed(st, Config{InstID: "X", Base: "15m", Extra: []string{"1H"}})
+	_, err := NewFeed(st, FeedConfig{InstID: "X", Base: "15m", Extra: []string{"1H"}})
 	if err == nil {
 		t.Fatal("辅周期不在库里应当报错")
 	}
@@ -660,7 +660,7 @@ func TestMissingExtraSeriesSaysWhatToDo(t *testing.T) {
 }
 
 func TestInvalidViewIsQuietButNaN(t *testing.T) {
-	f, err := NewFeed(nil, Config{InstID: "X", Base: "15m"})
+	f, err := NewFeed(nil, FeedConfig{InstID: "X", Base: "15m"})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -693,7 +693,7 @@ func TestFromToBounds(t *testing.T) {
 	st := newMemStore()
 	fill(t, st, "X", "1H", cs)
 
-	f, err := NewFeed(st, Config{InstID: "X", Base: "1H", From: cs[10].Ts, To: cs[20].Ts})
+	f, err := NewFeed(st, FeedConfig{InstID: "X", Base: "1H", From: cs[10].Ts, To: cs[20].Ts})
 	if err != nil {
 		t.Fatal(err)
 	}

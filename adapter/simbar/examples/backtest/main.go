@@ -49,7 +49,7 @@ func run(inst, bar, root string, cash, sz int64) error {
 	}
 	defer store.Close()
 
-	feed, err := tickflow.NewFeed(store, tickflow.Config{
+	feed, err := tickflow.NewFeed(store, tickflow.FeedConfig{
 		InstID: inst, Base: bar, Extra: []string{"1D"},
 		Aggregate: true, Lookback: 2,
 		Indicators: map[string][]tickflow.Indicator{

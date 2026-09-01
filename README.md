@@ -6,8 +6,9 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v0.5。** 整条链已跑通：同步与持久化、七个内置指标（两套口径）、
-> 多周期同步的可步进视图、以及与记账内核对接的适配层。
+> **状态：v1.0。** 公开 API 已收口。两年真实数据端到端验收过：同步的根数精确到
+> 个位、重跑零请求、自聚合与 OKX 官方逐位相同、11520 步里对辅周期做了 22974 次
+> 防未来函数检查零违规。详见 [docs/design.md](docs/design.md) 的「v1.0 验收」。
 
 ## 安装
 
@@ -150,7 +151,7 @@ BOLL(20) 35ns、CCI(20) 39ns、KDJ 42ns、RSI 7ns。**九个指标一整套 202n
 回测引擎消费本库的方式。主周期步进，辅周期只提供**最后一根已收盘**的上下文：
 
 ```go
-f, _ := tickflow.NewFeed(store, tickflow.Config{
+f, _ := tickflow.NewFeed(store, tickflow.FeedConfig{
     InstID:   "BTC-USDT-SWAP",
     Base:     "15m",                    // 步进的主周期
     Extra:    []string{"1H", "1D"},     // 辅周期，只读不步进
@@ -205,10 +206,16 @@ go run ./examples/feed -inst BTC-USDT-SWAP -root ./data
 不产出步进，使用者不必手工把 `From` 往前挪。没读满时 `v.Ready()` 如实报 false，
 而不是给出一个用半截历史算出来的值。
 
-**辅周期默认从库里读独立序列**（OKX 自己算的，最准）。`Aggregate: true` 改为
-从主周期聚合，只需同步一个周期，代价是空洞与边界会让结果与交易所的官方 K 线
-有偏差——别拿聚合出来的日线去和交易所对数。两种模式的**可见性时点完全一致**，
-有测试盯着：不然一拨开关回测结果就变了，而原因藏在没人会查的地方。
+**辅周期默认从库里读独立序列**（OKX 自己算的）。`Aggregate: true` 改为从主周期
+聚合，只需同步一个周期。
+
+聚合的失真**只来自缺根**——实测把 120 天的 15m 聚成 1H，与 OKX 官方的 1H 逐位
+比对 2879 根完整小时线：OHLC 四个字段共 11516 项、外加成交量，**全部零不一致**。
+底层齐全时聚合是精确的；只有当某根高周期缺了几根底层 K 线时才会失真，而那种
+小时在这 120 天里只有 2 个（数据两端）。
+
+两种模式的**可见性时点完全一致**，有测试盯着：不然一拨开关回测结果就变了，
+而原因藏在没人会查的地方。
 
 **实盘复用同一套代码。** `f.Push(bar, candle)` 手工喂一根，`store` 传 nil 就是
 纯实盘形态。WebSocket 收到收盘 K 线后调它，指标与视图的代码和回测完全一样。
@@ -385,6 +392,6 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 | v0.3 | ✅ `Feed` / `View` / 多周期同步 / 实时 `Push` |
 | v0.4 | ✅ 数据目录、写锁与只读模式、`candles/` 命名空间 |
 | v0.5 | ✅ `adapter/simbar`——与记账内核对接，三库端到端跑通 |
-| v1.0 | 文档 + 真实数据端到端验证 |
+| v1.0 | ✅ API 收口、根包文档、两年真实数据端到端验收 |
 
 设计取舍与理由见 [docs/design.md](docs/design.md)。
