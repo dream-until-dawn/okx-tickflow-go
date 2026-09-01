@@ -33,7 +33,8 @@ func main() {
 }
 
 func run(inst, base, root string, show int) error {
-	store, err := segfile.Open(root)
+	// 回测只读，用 OpenReadOnly：不取写锁，可以和正在同步的 examples/sync 并跑。
+	store, err := segfile.OpenReadOnly(root)
 	if err != nil {
 		return err
 	}
@@ -113,6 +114,7 @@ func run(inst, base, root string, show int) error {
 		return fmt.Errorf("一步都没走出来；库里的数据可能不够 warmup")
 	}
 
+	fmt.Printf("数据目录 %s（只读打开，不占写锁）\n", store.Root())
 	fmt.Printf("%s 主周期 %s，走了 %d 步（其中 %d 步指标未就绪，已跳过）\n",
 		inst, base, steps, notReady)
 	fmt.Printf("MACD 柱由负转正 %d 次\n\n", crossUp)

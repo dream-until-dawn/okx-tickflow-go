@@ -63,6 +63,7 @@ func run(inst, bar string, days int, root string) error {
 		return err
 	}
 
+	fmt.Printf("数据目录 %s（已取写锁）\n", store.Root())
 	fmt.Printf("同步 %s/%s：新增 %d 根，拉取 %d 批，耗时 %s\n",
 		inst, bar, rep.Added, rep.Fetches, time.Since(start).Round(time.Millisecond))
 	fmt.Printf("  处理区间 %s .. %s\n", ts(rep.Range.From), ts(rep.Range.To))

@@ -34,7 +34,8 @@ func main() {
 }
 
 func run(inst, bar, root string, n int) error {
-	store, err := segfile.Open(root)
+	// 只读，不取写锁，可与同步进程并跑。
+	store, err := segfile.OpenReadOnly(root)
 	if err != nil {
 		return err
 	}
