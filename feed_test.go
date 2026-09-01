@@ -710,3 +710,55 @@ func TestFromToBounds(t *testing.T) {
 		t.Errorf("区间不对：%s .. %s", str(got[0]), str(got[9]))
 	}
 }
+
+// TestSharedIndicatorInstanceRejected：指标是有状态的，同一个实例挂在两处时
+// 两边会交替推进同一份状态，算出来的值两边都是错的——而且不报错。
+// 这是这个库里最容易产生无声错误的一处使用方式，构造时就要拦住。
+func TestSharedIndicatorInstanceRejected(t *testing.T) {
+	st := newMemStore()
+	base := MustParsePeriod("15m")
+	start := MustParsePeriod("1D").Truncate(t0)
+	fill(t, st, "X", "15m", genBars(base, start, 200))
+	fill(t, st, "X", "1H", genBars(MustParsePeriod("1H"), start, 60))
+
+	shared := newInd("x", 1)
+
+	t.Run("跨周期共用", func(t *testing.T) {
+		_, err := NewFeed(st, FeedConfig{
+			InstID: "X", Base: "15m", Extra: []string{"1H"},
+			Indicators: map[string][]Indicator{"15m": {shared}, "1H": {shared}},
+		})
+		if err == nil {
+			t.Fatal("同一实例挂两个周期应当被拦住")
+		}
+		for _, want := range []string{"15m", "1H", "有状态"} {
+			if !strings.Contains(err.Error(), want) {
+				t.Errorf("错误信息该提到 %q，实为：%v", want, err)
+			}
+		}
+	})
+
+	t.Run("同周期内共用", func(t *testing.T) {
+		_, err := NewFeed(st, FeedConfig{
+			InstID: "X", Base: "15m",
+			Indicators: map[string][]Indicator{"15m": {shared, shared}},
+		})
+		if err == nil {
+			t.Fatal("同一实例在一个周期里出现两次应当被拦住")
+		}
+	})
+
+	t.Run("各建各的就没问题", func(t *testing.T) {
+		f, err := NewFeed(st, FeedConfig{
+			InstID: "X", Base: "15m", Extra: []string{"1H"},
+			Indicators: map[string][]Indicator{
+				"15m": {newInd("x", 1)},
+				"1H":  {newInd("x", 1)},
+			},
+		})
+		if err != nil {
+			t.Fatalf("不同实例应当允许：%v", err)
+		}
+		f.Close()
+	})
+}

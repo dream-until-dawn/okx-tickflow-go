@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"math"
+	"reflect"
 	"strings"
 )
 
@@ -171,6 +172,12 @@ func NewFeed(store Store, cfg FeedConfig) (*Feed, error) {
 		if !known[bar] {
 			return nil, fmt.Errorf("tickflow: 指标挂在了周期 %q 上，但它既不是 Base 也不在 Extra 里", bar)
 		}
+	}
+
+	// 同一个指标实例挂到两个周期上，两边会往同一个【有状态】的对象里推，
+	// 两个周期的值都会被污染——而且不报错。构造时按指针身份认出来。
+	if err := checkSharedIndicators(cfg); err != nil {
+		return nil, err
 	}
 
 	if f.base, err = newTFSeries(cfg.Base, basePeriod, cfg.Indicators[cfg.Base], cfg.Lookback); err != nil {
@@ -885,6 +892,37 @@ func checkNesting(base, high Period) error {
 				high.Bar(), ts, base.Bar())
 		}
 		ts = high.Next(ts)
+	}
+	return nil
+}
+
+// checkSharedIndicators 挡住「同一个指标实例挂在多处」。
+//
+// 指标是有状态的：Update 要往里写。同一个实例被两个周期共用，两边的 K 线会
+// 交替推进同一份状态，算出来的值两边都是错的——而且【不报错】，是这个库里
+// 最容易产生无声错误的一处使用方式。
+//
+// 按指针身份判定。非指针的实现存不住状态，共用它也不会被污染，跳过。
+func checkSharedIndicators(cfg FeedConfig) error {
+	// 按 Base、Extra 的顺序遍历，让错误信息稳定可复现——map 的遍历顺序是随机的。
+	bars := append([]string{cfg.Base}, cfg.Extra...)
+	seen := map[any]string{}
+	for _, bar := range bars {
+		for _, ind := range cfg.Indicators[bar] {
+			if ind == nil || reflect.ValueOf(ind).Kind() != reflect.Pointer {
+				continue
+			}
+			if prev, dup := seen[ind]; dup {
+				where := fmt.Sprintf("周期 %q 与 %q", prev, bar)
+				if prev == bar {
+					where = fmt.Sprintf("周期 %q 上出现了两次", bar)
+				}
+				return fmt.Errorf("tickflow: 指标 %q 的同一个实例挂在了%s；"+
+					"指标是有状态的，共用一个实例会让两边的值互相污染。"+
+					"给每处各建一个（indicator.MA(20) 调两次）", ind.Name(), where)
+			}
+			seen[ind] = bar
+		}
 	}
 	return nil
 }
