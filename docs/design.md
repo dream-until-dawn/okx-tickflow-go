@@ -622,5 +622,6 @@ OKX 的历史资金费率**只保留约 3 个月**。上游有 `FundingRateHisto
 | v0.1 | ✅ `Candle` / `Period` / `Source`(okx) / `Store`(segfile) / `Syncer` |
 | v0.2 | ✅ 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + 三层测试 |
 | v0.3 | ✅ `Feed` / `View` / 多周期同步 / 实时 `Push` |
-| v0.4 | `adapter/okxsim` |
+| v0.4 | ✅ 数据目录、写锁与只读模式、`candles/` 命名空间 |
+| v0.5 | `adapter/okxsim` |
 | v1.0 | 文档 + 真实数据端到端验证 |
