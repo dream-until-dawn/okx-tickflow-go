@@ -23,8 +23,8 @@ type SyncRequest struct {
 	To int64
 }
 
-// Report 是一次同步的结果。
-type Report struct {
+// SyncReport 是一次同步的结果。
+type SyncReport struct {
 	InstID string
 	Bar    string
 
@@ -88,7 +88,10 @@ func WithMaxMergeCandles(n int) SyncOption {
 	}
 }
 
-// WithClock 注入时钟，仅供测试。
+// WithClock 注入时钟，让「当前时刻」变得可控。
+//
+// Syncer 靠当前时刻算出「最后一根已收盘的 K 线」，因此不注入时钟的话，
+// 同一份代码在不同时刻跑出来的覆盖区间不同。写针对同步逻辑的测试时用它固定住。
 func WithClock(now func() int64) SyncOption {
 	return func(s *Syncer) {
 		if now != nil {
@@ -116,8 +119,8 @@ func NewSyncer(src Source, store Store, opts ...SyncOption) *Syncer {
 //
 // 已经覆盖过的区间不会重复请求。区间末端会被截到【最后一根已收盘】的 K 线：
 // 当前那根还在走，收盘价尚不可知，若把它算进覆盖，等它收盘后就再也不会去补了。
-func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (Report, error) {
-	rep := Report{InstID: req.InstID, Bar: req.Bar}
+func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (SyncReport, error) {
+	rep := SyncReport{InstID: req.InstID, Bar: req.Bar}
 
 	if req.InstID == "" {
 		return rep, errors.New("tickflow: instId 不能为空")
@@ -167,7 +170,7 @@ func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (Report, error) {
 
 // syncTail 处理「缺失段整体晚于已有数据」的情形：逐块拉、逐块落库、逐块记覆盖。
 // 被打断时已落库的部分连同覆盖都留着，下次接着跑。
-func (s *Syncer) syncTail(ctx context.Context, p Period, req SyncRequest, miss Range, rep *Report) error {
+func (s *Syncer) syncTail(ctx context.Context, p Period, req SyncRequest, miss Range, rep *SyncReport) error {
 	for _, ck := range s.chunks(p, miss) {
 		cs, err := s.fetch(ctx, p, req, ck, rep)
 		if err != nil {
@@ -190,7 +193,7 @@ func (s *Syncer) syncTail(ctx context.Context, p Period, req SyncRequest, miss R
 }
 
 // syncBackfill 处理回填：整段攒在内存里，一次 Merge 写完，成功后才记覆盖。
-func (s *Syncer) syncBackfill(ctx context.Context, p Period, req SyncRequest, miss Range, rep *Report) error {
+func (s *Syncer) syncBackfill(ctx context.Context, p Period, req SyncRequest, miss Range, rep *SyncReport) error {
 	var buf []Candle
 	for _, ck := range s.chunks(p, miss) {
 		cs, err := s.fetch(ctx, p, req, ck, rep)
@@ -224,7 +227,7 @@ func (s *Syncer) syncBackfill(ctx context.Context, p Period, req SyncRequest, mi
 
 // fetch 拉一块，并把结果清洗成「升序、去重、落在区间内」的样子。
 // Source 本就该保证这些，这里再兜一道——数据层的脏数据会在指标上放大成无声的错。
-func (s *Syncer) fetch(ctx context.Context, p Period, req SyncRequest, ck Range, rep *Report) ([]Candle, error) {
+func (s *Syncer) fetch(ctx context.Context, p Period, req SyncRequest, ck Range, rep *SyncReport) ([]Candle, error) {
 	cs, err := s.src.Fetch(ctx, FetchRequest{
 		InstID: req.InstID, Bar: req.Bar, From: ck.From, To: ck.To,
 	})

@@ -34,7 +34,7 @@ func TestThreeLibrariesCompose(t *testing.T) {
 	}
 
 	// 2. 带指标的可步进视图。
-	feed, err := tickflow.NewFeed(store, tickflow.Config{
+	feed, err := tickflow.NewFeed(store, tickflow.FeedConfig{
 		InstID: inst, Base: "15m", Extra: []string{"1H"},
 		Aggregate: true, Lookback: 3,
 		Indicators: map[string][]tickflow.Indicator{
@@ -163,7 +163,7 @@ func TestAdvanceMatchesManualConversion(t *testing.T) {
 		if err := store.Append(inst, "15m", cs); err != nil {
 			t.Fatal(err)
 		}
-		feed, err := tickflow.NewFeed(store, tickflow.Config{InstID: inst, Base: "15m"})
+		feed, err := tickflow.NewFeed(store, tickflow.FeedConfig{InstID: inst, Base: "15m"})
 		if err != nil {
 			t.Fatal(err)
 		}

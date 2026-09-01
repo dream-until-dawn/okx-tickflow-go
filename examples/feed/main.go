@@ -40,7 +40,7 @@ func run(inst, base, root string, show int) error {
 	}
 	defer store.Close()
 
-	f, err := tickflow.NewFeed(store, tickflow.Config{
+	f, err := tickflow.NewFeed(store, tickflow.FeedConfig{
 		InstID: inst,
 		Base:   base,
 		Extra:  []string{"1H", "1D"},

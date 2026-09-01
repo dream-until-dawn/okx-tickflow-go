@@ -16,7 +16,7 @@ func benchFeed(b *testing.B, extra []string, agg bool) (*Feed, []Candle) {
 	b.Helper()
 	base := MustParsePeriod("15m")
 	cs := genBars(base, MustParsePeriod("1D").Truncate(t0), 4096)
-	f, err := NewFeed(nil, Config{
+	f, err := NewFeed(nil, FeedConfig{
 		InstID: "X", Base: "15m", Extra: extra, Aggregate: agg, Lookback: 8,
 		Indicators: map[string][]Indicator{
 			"15m": {newInd("a", 1), newInd("b", 1, "x", "y", "z")},
