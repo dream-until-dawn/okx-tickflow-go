@@ -418,3 +418,89 @@ func contains(s, sub string) bool {
 	}
 	return false
 }
+
+// TestSyncForceRefetches 补上 coverage 唯一的救济手段。
+//
+// coverage 只追加，这在正常情况下是对的。但它有一个【会静默固化的失败模式】：
+// 交易所一次抖动返回空，那一段就被记成「确认无数据」，此后每次同步都跳过，
+// 而下游的回测在一个不该存在的空洞上照跑不误——本库不报错，错的是下游的结论。
+// 没有 Force 的话，唯一的补救是手删 .meta，连带丢掉整条序列的覆盖记录。
+func TestSyncForceRefetches(t *testing.T) {
+	full := series(t0, msMinute, 100)
+	src := &fakeSource{} // 先装作交易所抽风，什么都不返回
+	st := newMemStore()
+	clock := func() int64 { return t0 + 500*msMinute }
+	sy := NewSyncer(src, st, WithChunkCandles(50), WithClock(clock))
+	req := SyncRequest{InstID: "X", Bar: "1m", From: t0, To: t0 + 100*msMinute}
+
+	// 第一次：拉到空，整段被记成「确认无数据」。
+	rep, err := sy.Sync(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.Added != 0 || len(rep.Gaps) == 0 {
+		t.Fatalf("应当一根没有且报出空洞，实为 Added=%d Gaps=%v", rep.Added, rep.Gaps)
+	}
+
+	// 交易所恢复了。但常规同步【不会】再去看一眼——这正是那个静默固化。
+	src.have = full
+	rep, err = sy.Sync(context.Background(), req)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.Fetches != 0 || rep.Added != 0 {
+		t.Fatalf("常规同步不该重拉已覆盖的区间，实为 Fetches=%d Added=%d",
+			rep.Fetches, rep.Added)
+	}
+
+	// Force 才能救回来。
+	rep, err = sy.Sync(context.Background(), req)
+	_ = rep
+	if err != nil {
+		t.Fatal(err)
+	}
+	forced := req
+	forced.Force = true
+	rep, err = sy.Sync(context.Background(), forced)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if rep.Added != 100 {
+		t.Fatalf("Force 之后应当补齐 100 根，实为 %d", rep.Added)
+	}
+	got, _ := st.Range("X", "1m", 0, 0)
+	if !reflect.DeepEqual(tsOf(got), tsOf(full)) {
+		t.Error("Force 补回来的数据与源不一致")
+	}
+}
+
+// TestSyncForcePicksUpRevisions：OKX 偶尔会修正历史 K 线，Force 能把修正值取回来。
+func TestSyncForcePicksUpRevisions(t *testing.T) {
+	orig := series(t0, msMinute, 50)
+	src := &fakeSource{have: orig}
+	st := newMemStore()
+	sy := NewSyncer(src, st, WithClock(func() int64 { return t0 + 500*msMinute }))
+	req := SyncRequest{InstID: "X", Bar: "1m", From: t0, To: t0 + 50*msMinute}
+
+	if _, err := sy.Sync(context.Background(), req); err != nil {
+		t.Fatal(err)
+	}
+
+	// 交易所修正了第 20 根。
+	revised := append([]Candle(nil), orig...)
+	revised[20].Close = 99999
+	src.have = revised
+
+	forced := req
+	forced.Force = true
+	if _, err := sy.Sync(context.Background(), forced); err != nil {
+		t.Fatal(err)
+	}
+	got, _ := st.Range("X", "1m", 0, 0)
+	if got[20].Close != 99999 {
+		t.Errorf("第 20 根的收盘价是 %v，期望取回修正值 99999", got[20].Close)
+	}
+	if len(got) != 50 {
+		t.Errorf("重拉不该改变条数，实为 %d", len(got))
+	}
+}
