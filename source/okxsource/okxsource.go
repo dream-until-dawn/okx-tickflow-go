@@ -43,6 +43,10 @@ const (
 	//
 	// OKX 的强平按标记价判定而不是成交价。回测里要建模爆仓就必须用这条——
 	// 用成交价会让影线制造出真实不会发生的强平。
+	//
+	// ⚠️ 标记价历史有一条硬线：【港时 2020-01-01】。之后上线的合约与成交价同深，
+	// 之前上线的一律被截到那天（BTC-USD-SWAP 差 379 天）。早于它的区间会出现在
+	// SyncReport.Gaps 里，那不是同步没做好。见 TestLiveMarkPriceHistoryFloor。
 	MarkPrice
 
 	// IndexPrice 是指数价 K 线。instId 用【现货形式】，如 "ETH-USDT"
