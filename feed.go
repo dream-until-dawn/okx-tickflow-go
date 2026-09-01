@@ -907,7 +907,14 @@ func checkSharedIndicators(cfg FeedConfig) error {
 	// 按 Base、Extra 的顺序遍历，让错误信息稳定可复现——map 的遍历顺序是随机的。
 	bars := append([]string{cfg.Base}, cfg.Extra...)
 	seen := map[any]string{}
+	seenBar := map[string]bool{}
 	for _, bar := range bars {
+		// 同一个周期出现两次是【另一回事】（Base 与 Extra 撞了），由后面那条更精确
+		// 的检查去报。这里若不跳过，会把它误诊成「指标实例被共用」。
+		if seenBar[bar] {
+			continue
+		}
+		seenBar[bar] = true
 		for _, ind := range cfg.Indicators[bar] {
 			if ind == nil || reflect.ValueOf(ind).Kind() != reflect.Pointer {
 				continue

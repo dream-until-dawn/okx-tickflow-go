@@ -19,7 +19,7 @@
 | 自定义指标 | `tickflow.Indicator` 接口 | 实现四个方法即可，与内置的一视同仁 |
 | 可步进的多周期视图 | `tickflow.Feed` | 主周期步进，辅周期只给「最后一根已收盘」的 |
 | 往回看 N 根 | `View.Prev(n)` | 由 `FeedConfig.Lookback` 决定上限 |
-| 标记价随视图给出 | `FeedConfig.MarkStore` + `View.MarkPx()` | 按**同 ts** 与主周期锁步 |
+| 标记价随视图给出 | `FeedConfig.MarkStore` + `View.MarkPx()` | 按**同 ts** 与主周期锁步；`simbar.Advance` 自动带上 |
 | 实盘复用同一套代码 | `Feed.Push` / `PushWithMark` | `store` 传 nil 即纯实盘形态 |
 | 喂给记账内核 | `adapter/simbar` | 独立嵌套模块，主模块不依赖 decimal |
 
@@ -96,6 +96,7 @@
 |---|---|---|
 | `2D` / `3D` 的锚点（哪两天、哪三天归为一根） | 按「自 epoch 起按港时自然日计数」推定，实测对上了 | `SyncReport.Misaligned` 会不为零；用 `RegisterFixedPeriod` 覆盖 |
 | `history-candles` 的深度上限 | 只知道**至少** 6 年，上限未知 | 更早的区间会出现在 `SyncReport.Gaps` 里 |
+| 标记价历史与普通 K 线**同深** | 由 okx-position-simulator-go 实测（2024-01-01 两者都有，2022-01-01 两者都无） | 取得到普通 K 线就一定取得到标记价——所以缺标记价是**完全可避免**的降级 |
 | OKX 平台的指标口径是 CN | 2026-09-01 实测 | `TestMatchesOKXPlatform` 会先炸——但只在有人跑测试时 |
 | 6H 及以上按香港时间对齐 | OKX 文档说的，且实测对上 | 同 2D/3D |
 
@@ -109,7 +110,7 @@
 | 风险 | 静默？ | 后果 | 怎么办 |
 |---|---|---|---|
 | **不计资金费** | 是 | 系统性**高估多头**持仓收益、低估空头 | 方向已知，解读结果时统一扣减。自备数据可在拿到 `Bar` 后自行赋值 |
-| **缺标记价退回成交价** | 是 | 影线制造出真实不会发生的强平；对尾部风险就是强平的策略（做多网格）是**假阴性** | 配 `FeedConfig.MarkStore`，并在记账内核打开 `Config.RequireMarkPx` |
+| **缺标记价退回成交价** | **否**（记账内核 v1.0.0+ 默认报错） | 影线制造出真实不会发生的强平；对尾部风险就是强平的策略（做多网格）是**假阴性** | 配 `FeedConfig.MarkStore`，`simbar.Advance` 会自动带上。确实拿不到时才打开对方的 `Config.AllowMarkPxFallback`——那等于接受这份偏差 |
 | **`Aggregate` 在底层缺根处失真** | 是 | 聚合出的高周期 K 线与交易所对不上 | 底层齐全时聚合是**精确**的（实测零不一致）。用 `SyncReport.Gaps` 事先查缺根 |
 | **`1D` 与 `1Dutc` 是两条序列** | 是 | 选错了整个回测偏移一天 | 6H 及以上都有这个分叉。OKX 默认是港时那条（不带 `utc` 后缀） |
 | **`SetDefaultConvention` 跑到一半改** | 是 | 新旧口径的指标混在一起 | 只在程序初始化时设一次。并发调用本身是安全的（原子），但结果不可预测 |
