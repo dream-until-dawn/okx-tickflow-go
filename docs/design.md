@@ -31,11 +31,11 @@ okx-tickflow-go/
 ├── sync.go              Syncer：按 coverage 只拉缺失区间
 ├── indicator/           Indicator 接口 + MA EMA MACD KDJ RSI CCI BOLL
 ├── feed.go              Feed / View / 多周期同步
-└── adapter/okxsim/      → okxsim.Bar（独立嵌套模块，隔离 decimal 依赖）
+└── adapter/simbar/      → okxsim.Bar（独立嵌套模块，隔离 decimal 依赖）
 ```
 
 **主模块依赖只有 okx-api-v5-go 一个**（它自己只依赖 gorilla/websocket）。
-`shopspring/decimal` 与整个模拟器包被隔离在 `adapter/okxsim` 这个嵌套模块里——
+`shopspring/decimal` 与整个模拟器包被隔离在 `adapter/simbar` 这个嵌套模块里——
 只想拉数据存数据的使用者不该被迫拉进一个记账内核。这跟
 okx-position-simulator-go 自己把 `net/http` 隔离在 `refdata/live`、
 把对拍工具做成独立嵌套模块是同一个思路。
@@ -55,7 +55,7 @@ Go 版本取 **1.22**，与两个上游对齐。因此 `Iterator` 用显式接�
 //
 // OHLCV 用 float64 而非 decimal：指标计算是本库的热路径，decimal 会慢一到两个
 // 数量级且没有任何精度收益——OKX 的价格位数远在 float64 的 15 位有效数字之内。
-// 与 simulator 的 decimal 世界的转换收在 adapter/okxsim 一个地方。
+// 与 simulator 的 decimal 世界的转换收在 adapter/simbar 一个地方。
 type Candle struct {
     Ts          int64   // 开盘时间，毫秒
     Open        float64
@@ -538,11 +538,30 @@ ts 必须严格递增且落在该周期的对齐网格上，否则报错——�
 
 ## 七、与 okx-position-simulator-go 对接
 
-`adapter/okxsim` 是**独立嵌套模块**，主模块不依赖它。
+`adapter/simbar` 是**独立嵌套模块**，主模块不依赖它。
+
+> 草稿里叫 `adapter/okxsim`，实现时改了叶子名：**记账内核自己的包名就是
+> `okxsim`**。同名的话，每个同时用到两边的使用者都得给其中一个起别名。
+> 叫 `simbar` 反而更直白——它产出的正是 `Bar`。隔离策略（独立嵌套模块）没变。
 
 ```go
-func ToBar(instID string, c tickflow.Candle) okxsim.Bar
+func ToBar(instID string, c tickflow.Candle, opts ...Option) (okxsim.Bar, error)
+func ToBars(instID string, cs []tickflow.Candle, opts ...Option) ([]okxsim.Bar, error)
+func Advance(sim *okxsim.Simulator, instID string, v tickflow.View, opts ...Option) (okxsim.StepResult, error)
+
+func WithMarkPx(px float64) Option
+func WithIdxPx(px float64) Option
+func Dec(f float64) decimal.Decimal
 ```
+
+**返回 error 而不是直接给 Bar**：`decimal.NewFromFloat` 碰上 NaN 会 **panic**，
+而 NaN 恰恰是「用了一个无效 View」的正常产物。与其让它从库深处炸出来，
+不如在这里拦住并说清楚。校验 instId、ts、三个价格的有限性与正负、以及高低顺序。
+
+**隔离是实测过的**，不是声称的：主模块 `go list -m all` 只有 `okx-api-v5-go`，
+`shopspring/decimal` 在主模块依赖图里出现 **0 次**，根目录 `go list ./...`
+也不包含 adapter。代价是根目录的 `go build ./...` / `go test ./...` 覆盖不到它，
+要单独 `cd adapter/simbar` 执行。
 
 | okxsim.Bar 字段 | 取值 |
 |---|---|
@@ -553,8 +572,26 @@ func ToBar(instID string, c tickflow.Candle) okxsim.Bar
 | `IdxPx` | **留空** |
 | `Funding` | **永远 nil** |
 
-`float64 → decimal` 用 `decimal.NewFromFloat`，它取能往返的最短十进制表示，
-OKX 的价格位数远在 float64 的精度内，**转换无损**。
+### float64 → decimal 无损，这条有测试盯着
+
+行情层用 float64（指标计算是热路径），记账层用 decimal（钱的事不能有误差）。
+转换收在 `Dec` 一处，走 `decimal.NewFromFloat`——它取的是能往返回原值的最短
+十进制表示，而 OKX 的价格有效数字远在 float64 的 15 位之内。
+
+这曾经只是个「应该没问题」的判断，现在是测出来的：
+
+- **真实行情**：300 根 15m BTC-USDT-SWAP 的全部 OHLCV 字段
+- **各量级的刻度**：从 `1e-8`（小币种）到 `1234567.89`，含 `0.1/0.2/0.3`
+  这类二进制表示不精确的经典值
+- 断言两条：`Dec(f).InexactFloat64() == f`（按位相等，不是近似），
+  且 `Dec(f).String() == strconv.FormatFloat(f, 'f', -1, 64)`（逐位相同，
+  既没多出尾数也没丢位）
+
+端到端还验了一遍：一段真实行情走完之后，记账内核记下的最新价与行情层最后那根
+的收盘价逐位相同。
+
+`Dec` 对 NaN / Inf 返回零值而不是 panic——回测循环里最不该出现的就是从库深处
+炸出来的 panic。真正该拦住非法价格的地方是 `ToBar` 的校验。
 
 ### MarkPx / IdxPx 留空
 
@@ -579,7 +616,21 @@ OKX 的历史资金费率**只保留约 3 个月**。上游有 `FundingRateHisto
 全都不计至少是**一致**的偏差：系统性高估多头持仓收益、低估空头，
 方向已知，可以在解读结果时统一扣减。
 
-**这一点必须在 README 显著位置标注，不能只写在函数注释里。**
+**这一点必须在 README 显著位置标注，不能只写在函数注释里**——使用者不会先去读
+`ToBar` 的注释才开始跑回测。本包也**不提供**设置 `Funding` 的选项：自备了数据
+的使用者可以在拿到 `Bar` 之后自行赋值，那是明确的一步动作，而不是本库替谁做的
+默认。有一个测试专门锁住「`ToBar` 永远不设 `Funding`」，免得日后被当成遗漏补上。
+
+### 三个库真的接得上
+
+单元测试证明每一步对，只有集成测试能证明它们【接得上】。
+`adapter/simbar/integration_test.go` 把整条链跑通：
+
+	真实行情 → segfile 落地 → Feed 步进（带指标）→ simbar → 记账内核
+
+挂一笔限价买单，等行情的最低价触及它，验证成交、持仓与价格无损。
+`adapter/simbar/examples/backtest` 是同一条链的可运行版本（均线金叉死叉，
+5741 步、400 笔成交）——策略本身是最土的那种，只为把链路跑通。
 
 ---
 
@@ -623,5 +674,5 @@ OKX 的历史资金费率**只保留约 3 个月**。上游有 `FundingRateHisto
 | v0.2 | ✅ 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + 三层测试 |
 | v0.3 | ✅ `Feed` / `View` / 多周期同步 / 实时 `Push` |
 | v0.4 | ✅ 数据目录、写锁与只读模式、`candles/` 命名空间 |
-| v0.5 | `adapter/okxsim` |
+| v0.5 | ✅ `adapter/simbar`——与记账内核对接，三库端到端跑通 |
 | v1.0 | 文档 + 真实数据端到端验证 |

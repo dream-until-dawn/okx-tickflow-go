@@ -6,8 +6,8 @@
 旁边是 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)（记账），
 下游是回测引擎（消费视图）。本库**不做交易决策，也不做仓位核算**。
 
-> **状态：v0.3。** 数据层与视图层已完整：同步与持久化、七个内置指标（两套口径）、
-> 多周期同步的可步进视图。剩下与记账器对接的适配层，见下方排期。
+> **状态：v0.5。** 整条链已跑通：同步与持久化、七个内置指标（两套口径）、
+> 多周期同步的可步进视图、以及与记账内核对接的适配层。
 
 ## 安装
 
@@ -15,8 +15,17 @@
 go get github.com/dream-until-dawn/okx-tickflow-go
 ```
 
-`go 1.22`。主模块的依赖树**只有 okx-api-v5-go 一个**——`shopspring/decimal`
-与整个记账内核隔离在 `adapter/okxsim` 子模块里，只想拉数据的使用者不会被牵连。
+`go 1.22`。主模块的依赖树**只有 okx-api-v5-go 一个**：
+
+```
+$ go list -m all
+github.com/dream-until-dawn/okx-tickflow-go
+github.com/dream-until-dawn/okx-api-v5-go v0.1.0
+github.com/gorilla/websocket v1.5.3
+```
+
+`shopspring/decimal` 与整个记账内核隔离在 `adapter/simbar` 这个**独立嵌套模块**
+里，只想拉数据的使用者不会被牵连（实测：`decimal` 在主模块的依赖图里出现 0 次）。
 
 ## 快速开始
 
@@ -71,7 +80,9 @@ OKX 的历史资金费率**只保留约 3 个月**。技术上可以从今天起
 很容易被误读成「策略在不同市况下的表现差异」。
 
 全都不计至少是**一致**的偏差——系统性高估多头持仓收益、低估空头，方向已知，
-可以在解读结果时统一扣减。`adapter/okxsim` 的 `ToBar` 因此永远不填 `Funding`。
+可以在解读结果时统一扣减。`adapter/simbar` 的 `ToBar` 因此永远不填 `Funding`，
+本包也**不提供**设置它的选项；自备数据的使用者可以在拿到 `Bar` 之后自行赋值——
+那是明确的一步动作，而不是本库替谁做的默认。
 
 ## 技术指标
 
@@ -301,6 +312,70 @@ type Store interface {
 TICKFLOW_LIVE=1 go test ./source/okxsource/
 ```
 
+## 与记账内核对接
+
+`adapter/simbar` 把 K 线转成 [okx-position-simulator-go](https://github.com/dream-until-dawn/okx-position-simulator-go)
+的 `Bar`。它是**独立嵌套模块**——只想拉行情的使用者不会被拖进 `decimal` 与整个
+记账内核。
+
+```
+go get github.com/dream-until-dawn/okx-tickflow-go/adapter/simbar
+```
+
+```go
+import (
+    okxsim "github.com/dream-until-dawn/okx-position-simulator-go"
+    "github.com/dream-until-dawn/okx-tickflow-go/adapter/simbar"
+)
+
+for feed.Next() {
+    v := feed.View()
+    if !v.Ready() { continue }
+
+    step, err := simbar.Advance(sim, "BTC-USDT-SWAP", v)   // 转换 + 推进一步
+    // step.Fills / step.Liquidations / step.Canceled ...
+}
+```
+
+也可以只做转换：`simbar.ToBar(instID, candle)` / `ToBars(instID, candles)`。
+
+| `okxsim.Bar` 字段 | 取值 |
+|---|---|
+| `High` / `Low` / `Ts` | 直取 |
+| `Last` | `Close`——记账内核用它撮合限价单 |
+| `MarkPx` / `IdxPx` | 留空，除非 `WithMarkPx` / `WithIdxPx` 给出 |
+| `Funding` | **永远 nil**，见上一节 |
+
+**返回 `error` 而不是直接给 `Bar`**：`decimal.NewFromFloat` 碰上 NaN 会 panic，
+而 NaN 恰恰是「用了一个无效 `View`」的正常产物。与其让它从库深处炸出来，
+不如在这里拦住并说清楚。
+
+> 包名叫 `simbar` 而不是 `okxsim`：记账内核自己的包名就是 `okxsim`，同名的话
+> 每个同时用到两边的使用者都得起别名。
+
+### float64 → decimal 无损，这条是测出来的
+
+行情层用 float64（指标计算是热路径），记账层用 decimal（钱的事不能有误差）。
+转换收在 `simbar.Dec` 一处，走 `decimal.NewFromFloat`——它取能往返回原值的最短
+十进制表示，OKX 的价格有效数字远在 float64 的 15 位之内。
+
+测试覆盖 300 根真实 15m 行情的全部 OHLCV，加上从 `1e-8` 到 `1234567.89` 的各量级
+刻度，断言两条：转回 float64 **按位相等**，且 decimal 的十进制形态与 float64 的
+最短表示**逐位相同**。端到端还验了一遍：一段真实行情走完，记账内核记下的最新价
+与行情层最后那根的收盘价逐位相同。
+
+### 完整一条链
+
+```
+cd adapter/simbar && go run ./examples/backtest -root ../../data
+```
+
+行情库 → 带指标的步进视图 → 记账内核，均线金叉死叉跑 5741 步、400 笔成交。
+策略本身是最土的那种，只为把链路跑通——本库不做交易决策。
+
+> 嵌套模块的代价：仓库根目录的 `go build ./...` 与 `go test ./...` 覆盖不到它，
+> 要单独 `cd adapter/simbar` 执行。
+
 ## 排期
 
 | 版本 | 内容 |
@@ -309,7 +384,7 @@ TICKFLOW_LIVE=1 go test ./source/okxsource/
 | v0.2 | ✅ 七个内置指标（MA EMA MACD KDJ RSI CCI BOLL）+ 两套口径 + 三层测试 |
 | v0.3 | ✅ `Feed` / `View` / 多周期同步 / 实时 `Push` |
 | v0.4 | ✅ 数据目录、写锁与只读模式、`candles/` 命名空间 |
-| v0.5 | `adapter/okxsim` |
+| v0.5 | ✅ `adapter/simbar`——与记账内核对接，三库端到端跑通 |
 | v1.0 | 文档 + 真实数据端到端验证 |
 
 设计取舍与理由见 [docs/design.md](docs/design.md)。
