@@ -30,10 +30,14 @@
 // # 两套口径
 //
 // 同一个指标名，TradingView 与国内行情软件算出来的数不一样。拿本库的结果去
-// 和某个软件对数之前，先确认口径。默认 TV，构造时可换：
+// 和某个软件对数之前，先确认口径。
 //
-//	indicator.MACD(12, 26, 9)                  // TradingView 口径
-//	indicator.MACD(12, 26, 9, indicator.CN)    // 国内软件口径
+// **默认是 CN，因为 OKX 自己的行情界面用的就是这一套**——2026-09-01 拿
+// ETH-USDT-SWAP 的日线在 OKX 平台上逐行比对确认，MACD 与 KDJ 两个都对上 CN、
+// 对不上 TV。这是给 OKX 用的库，默认就该跟 OKX 一致。
+//
+//	indicator.MACD(12, 26, 9)                  // CN 口径（默认，与 OKX 一致）
+//	indicator.MACD(12, 26, 9, indicator.TV)    // TradingView 口径
 //	indicator.MA(20, indicator.Named("fast"))  // 改视图里的键名
 //
 // 差异【只有三处】，其余两套完全一致。不为了对称而编造差异：
@@ -67,9 +71,14 @@ type Indicator = tickflow.Indicator
 type Convention int
 
 const (
-	// TV 是 TradingView 口径，也是本库的默认。
+	// TV 是 TradingView 口径。
 	TV Convention = iota
-	// CN 是国内行情软件（通达信一系）的口径。
+
+	// CN 是国内行情软件（通达信一系）的口径，也是本库的默认。
+	//
+	// 默认选它不是因为偏好，而是实测出来的：OKX 自己的行情界面用的就是这一套。
+	// 2026-09-01 拿 ETH-USDT-SWAP 的日线逐行比对，MACD 的柱与 KDJ 的 K/D/J
+	// 都对上 CN、对不上 TV。见 okx_convention_test.go 里锁住的那组基准值。
 	CN
 )
 
@@ -98,13 +107,13 @@ func (n nameOption) apply(b *base) { b.name = string(n) }
 //	indicator.MACD(12, 26, 9, indicator.Named("macd_fast"))
 func Named(s string) Option { return nameOption(s) }
 
-var defaultConvention = TV
+var defaultConvention = CN
 
 // SetDefaultConvention 设置全局默认口径。
 //
 // 只在【程序初始化时】调用一次。口径是在指标【构造时】读取的，之后再改不会
-// 影响已经构造出来的指标。想都用国内口径就在 main 开头设一次，省得每个指标
-// 都写一遍。
+// 影响已经构造出来的指标。默认已经是 CN（与 OKX 一致），想全局改用 TradingView
+// 口径就在 main 开头设一次，省得每个指标都写一遍。
 func SetDefaultConvention(c Convention) { defaultConvention = c }
 
 // DefaultConvention 返回当前的全局默认口径。
