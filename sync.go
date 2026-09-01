@@ -21,6 +21,21 @@ type SyncRequest struct {
 
 	// To 是结束时刻（不含）。0 表示同步到【最后一根已收盘】的 K 线。
 	To int64
+
+	// Force 忽略已有的 coverage，把整个区间重新拉一遍。
+	//
+	// coverage 是只追加的，正常情况下这是对的：记下「已请求并确认」才能不重复拉。
+	// 但它有一个【会静默固化的失败模式】——交易所一次抖动返回了空，那一段就被记成
+	// 「确认无数据」，此后每次同步都跳过它，而下游的回测在一个不该存在的空洞上
+	// 照跑不误。没有这个开关的话，唯一的补救是手删 .meta，连带丢掉整条序列的
+	// 覆盖记录。
+	//
+	// 另一个用处：OKX 偶尔会修正历史 K 线，重拉一段能把修正值取回来
+	//（走 Merge，同 ts 以新数据为准）。
+	//
+	// 代价是这一段一定会重新走网络，且落在已有数据中间时会触发一次全文件重写。
+	// 平时不要开。
+	Force bool
 }
 
 // SyncReport 是一次同步的结果。
@@ -151,7 +166,12 @@ func (s *Syncer) Sync(ctx context.Context, req SyncRequest) (SyncReport, error) 
 		return rep, err
 	}
 
-	for _, miss := range meta.Coverage.Missing(want) {
+	missing := meta.Coverage.Missing(want)
+	if req.Force {
+		// 明确要求重来：不看 coverage，整段都当作缺失。
+		missing = Ranges{want}
+	}
+	for _, miss := range missing {
 		// 缺的这段整体晚于已有数据 → 纯追加，可以逐块落库；
 		// 否则是回填，必须攒成一次 Merge，否则会 O(n²) 地反复重写整个文件。
 		tail := meta.Count == 0 || miss.From > meta.LastTs
