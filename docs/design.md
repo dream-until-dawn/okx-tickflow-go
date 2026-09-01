@@ -671,14 +671,34 @@ OKX 的历史资金费率**只保留约 3 个月**。上游有 `FundingRateHisto
 
 ---
 
+## 竞态检测：装了工具链，抓到一个真的竞争
+
+这一条曾经列在「已知的空白」里：开发机没有 C 编译器，`go test -race` 起不来
+（`-race requires cgo`），`segfile` 的并发安全只有代码审读担保。2026-09-01 装了
+MinGW-w64（`BrechtSanders.WinLibs.POSIX.UCRT`，GCC 16.1.0，posix 线程 + UCRT），
+补上了这块。
+
+**先说一件容易自欺的事：拿现成的测试跑 `-race`，几乎什么都证明不了。**
+竞态检测只报【实际发生过】的竞争，而那些测试全是单 goroutine 的——跑出来必然
+全绿，而那份绿是假的。所以真正要做的是先写会并发起来的测试：
+
+- `store/segfile/concurrent_test.go`：一写六读同压一个 Store、多游标同时遍历、
+  多 goroutine 并发首次打开不同序列。除了竞态检测本身，还检查读到的记录**自洽**
+  （撕裂的读会打破 `High == Open+1` 这类不变量，那种数据竞态检测未必报，
+  却会让回测悄悄算错）。
+- `indicator/concurrent_test.go`：并发读写全局默认口径、并发构造指标。
+- `concurrent_test.go`（根包）：并发压周期注册表、多个独立 Feed 并行推进。
+
+**然后就抓到了一个真的。** `indicator` 的全局默认口径是个无保护的包级变量，
+`SetDefaultConvention` 写它、每次构造指标读它。文档写着「只在程序初始化时调用
+一次」，但那是**约定**——约定挡不住并发。已改成 `atomic.Int32`。
+
+> 这正是「已知的空白」值得写出来的理由：那一条不是形式主义的免责声明，
+> 它下面真的埋着东西。
+
 ## 已知的空白
 
 不是遗漏，是知道而暂时没有的。列在这里，免得日后被当成「应该能用」。
-
-**竞态检测没跑过。** `go test -race` 需要 cgo，而开发这台机器没有 C 编译器
-（`-race requires cgo`）。`segfile.Store` 的「进程内多读单写」是靠 `RWMutex` 加
-代码审读保证的，**没有经过工具验证**。有 cgo 环境时值得补一次
-`go test -race ./...`——这一条不该混在「测试全绿」里悄悄过去。
 
 **标记价与指数价拿不到。** 它们在 OKX 是各自独立的 K 线序列
 （`mark-price-candles` / `index-candles`），而上游 okx-api-v5-go 还没有这两个

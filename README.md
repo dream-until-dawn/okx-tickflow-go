@@ -397,11 +397,23 @@ cd adapter/simbar && go run ./examples/backtest -root ../../data
 
 ## 已知的空白
 
-不是遗漏，是知道而暂时没有的：**竞态检测没跑过**（开发机没有 cgo，
-`go test -race` 跑不起来，`segfile` 的并发安全靠代码审读而非工具验证）、
-**标记价与指数价拿不到**（上游 SDK 还没有这两个端点）、
-**2D / 3D 的锚点是推定的**（实测对上了，但 OKX 未文档化）。
+不是遗漏，是知道而暂时没有的：**标记价与指数价拿不到**（上游 SDK 还没有这两个
+端点）、**2D / 3D 的锚点是推定的**（实测对上了，但 OKX 未文档化）。
 详见 [docs/design.md](docs/design.md) 的「已知的空白」。
+
+### 竞态检测
+
+已经跑过了，`go test -race ./...` 两个模块全绿。
+
+但**拿单 goroutine 的测试跑 `-race` 几乎什么都证明不了**——竞态检测只报实际发生过
+的竞争。所以另写了会真并发起来的测试（一写六读同压 Store、多游标同时遍历、并发
+构造指标、多个独立 Feed 并行推进），并检查读到的记录自洽而不只是「没报错」。
+
+这一跑就抓到一个真的：`indicator` 的全局默认口径是个无保护的包级变量，
+已改成 `atomic.Int32`。
+
+> Windows 上跑 `-race` 需要 cgo，装一套 MinGW-w64 即可：
+> `winget install BrechtSanders.WinLibs.POSIX.UCRT`（要 POSIX 线程那个变体）。
 
 ## 排期
 

@@ -55,6 +55,7 @@ package indicator
 import (
 	"fmt"
 	"math"
+	"sync/atomic"
 
 	tickflow "github.com/dream-until-dawn/okx-tickflow-go"
 )
@@ -107,17 +108,28 @@ func (n nameOption) apply(b *base) { b.name = string(n) }
 //	indicator.MACD(12, 26, 9, indicator.Named("macd_fast"))
 func Named(s string) Option { return nameOption(s) }
 
-var defaultConvention = CN
+// defaultConvention 是全局默认口径。
+//
+// 用原子变量而不是普通的包级变量：SetDefaultConvention 与指标构造会并发发生，
+// 普通变量在那里就是数据竞争。这不是假想——竞态检测第一次跑起来就把它抓了出来。
+// 文档写着「只在程序初始化时调用一次」，但那是【约定】，约定挡不住并发。
+// concurrent_test.go 里有测试盯着这一条。
+var defaultConvention atomic.Int32
+
+func init() { defaultConvention.Store(int32(CN)) }
 
 // SetDefaultConvention 设置全局默认口径。
 //
-// 只在【程序初始化时】调用一次。口径是在指标【构造时】读取的，之后再改不会
-// 影响已经构造出来的指标。默认已经是 CN（与 OKX 一致），想全局改用 TradingView
-// 口径就在 main 开头设一次，省得每个指标都写一遍。
-func SetDefaultConvention(c Convention) { defaultConvention = c }
+// 建议只在【程序初始化时】调用一次：口径是在指标【构造时】读取的，跑到一半再改
+// 不会影响已经构造出来的指标，只会让后面新建的那些用上新口径——那种半新半旧的
+// 状态很难查。默认已经是 CN（与 OKX 一致），想全局改用 TradingView 口径就在 main
+// 开头设一次，省得每个指标都写一遍。
+//
+// 并发调用是安全的（原子写），但「安全」不等于「结果可预测」，见上。
+func SetDefaultConvention(c Convention) { defaultConvention.Store(int32(c)) }
 
 // DefaultConvention 返回当前的全局默认口径。
-func DefaultConvention() Convention { return defaultConvention }
+func DefaultConvention() Convention { return Convention(defaultConvention.Load()) }
 
 type base struct {
 	name string
@@ -125,7 +137,7 @@ type base struct {
 }
 
 func newBase(name string, opts []Option) base {
-	b := base{name: name, conv: defaultConvention}
+	b := base{name: name, conv: DefaultConvention()}
 	for _, o := range opts {
 		o.apply(&b)
 	}
