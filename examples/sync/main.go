@@ -26,15 +26,16 @@ func main() {
 		bar  = flag.String("bar", "15m", "周期")
 		days = flag.Int("days", 30, "往回同步多少天")
 		root = flag.String("root", "./data", "数据目录")
+		kind = flag.String("kind", "candles", "拉哪条序列：candles / mark / index")
 	)
 	flag.Parse()
 
-	if err := run(*inst, *bar, *days, *root); err != nil {
+	if err := run(*inst, *bar, *days, *root, *kind); err != nil {
 		log.Fatal(err)
 	}
 }
 
-func run(inst, bar string, days int, root string) error {
+func run(inst, bar string, days int, root, kind string) error {
 	p, err := tickflow.ParsePeriod(bar)
 	if err != nil {
 		return err
@@ -44,11 +45,28 @@ func run(inst, bar string, days int, root string) error {
 	if err != nil {
 		return err
 	}
-	src, err := okxsource.New(client)
+	// 三条序列各有各的端点与命名空间。标记价与指数价没有成交量。
+	var (
+		series okxsource.Series
+		ns     segfile.SeriesKind
+	)
+	switch kind {
+	case "candles":
+		series, ns = okxsource.Trades, segfile.Candles
+	case "mark":
+		series, ns = okxsource.MarkPrice, segfile.Mark
+	case "index":
+		// 指数用现货形式的 instId，如 ETH-USDT 而不是 ETH-USDT-SWAP。
+		series, ns = okxsource.IndexPrice, segfile.Index
+	default:
+		return fmt.Errorf("-kind 只能是 candles / mark / index，实为 %q", kind)
+	}
+
+	src, err := okxsource.New(client, series)
 	if err != nil {
 		return err
 	}
-	store, err := segfile.Open(root)
+	store, err := segfile.Open(root, ns)
 	if err != nil {
 		return err
 	}
@@ -101,9 +119,11 @@ func run(inst, bar string, days int, root string) error {
 			ts(c.Ts), c.Open, c.High, c.Low, c.Close, c.Vol)
 	}
 
-	if fi, err := os.Stat(fmt.Sprintf("%s/%s/%s.dat", root, inst, bar)); err == nil {
-		fmt.Printf("\n数据文件 %d 字节 = %d 根 × %d 字节\n",
-			fi.Size(), fi.Size()/segfile.RecordSize, segfile.RecordSize)
+	if dat, _, err := store.Path(inst, bar); err == nil {
+		if fi, err := os.Stat(dat); err == nil {
+			fmt.Printf("\n数据文件 %d 字节 = %d 根 × %d 字节\n",
+				fi.Size(), fi.Size()/segfile.RecordSize, segfile.RecordSize)
+		}
 	}
 	return nil
 }

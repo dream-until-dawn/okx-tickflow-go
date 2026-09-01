@@ -13,7 +13,7 @@ go 1.22
 replace github.com/dream-until-dawn/okx-tickflow-go => ../..
 
 require (
-	github.com/dream-until-dawn/okx-position-simulator-go v0.9.2
+	github.com/dream-until-dawn/okx-position-simulator-go v0.9.4
 	github.com/dream-until-dawn/okx-tickflow-go v1.0.0
 	github.com/shopspring/decimal v1.4.0
 )

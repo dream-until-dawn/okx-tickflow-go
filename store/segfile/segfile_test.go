@@ -299,7 +299,7 @@ func TestReconcileTruncatesCrashResidue(t *testing.T) {
 	}
 	s1.Close()
 
-	dat := filepath.Join(root, "candles", inst, bar+".dat")
+	dat := filepath.Join(root, string(Candles), inst, bar+".dat")
 	f, err := os.OpenFile(dat, os.O_WRONLY|os.O_APPEND, 0o644)
 	if err != nil {
 		t.Fatal(err)
@@ -337,7 +337,7 @@ func TestReconcileRefusesToHideDataLoss(t *testing.T) {
 	}
 	s1.Close()
 
-	dat := filepath.Join(root, "candles", inst, bar+".dat")
+	dat := filepath.Join(root, string(Candles), inst, bar+".dat")
 	if err := os.Truncate(dat, 5*RecordSize); err != nil {
 		t.Fatal(err)
 	}

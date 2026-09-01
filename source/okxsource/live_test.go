@@ -8,7 +8,7 @@ import (
 
 	okx "github.com/dream-until-dawn/okx-api-v5-go"
 	tickflow "github.com/dream-until-dawn/okx-tickflow-go"
-	"github.com/dream-until-dawn/okx-tickflow-go/source/okxsource"
+	okxsource "github.com/dream-until-dawn/okx-tickflow-go/source/okxsource"
 )
 
 // 打真实接口的测试。默认跳过，设 TICKFLOW_LIVE=1 才跑。
@@ -162,5 +162,92 @@ func TestLiveHistoryDepth(t *testing.T) {
 		} else {
 			t.Logf("%s: 至少能回溯到 %s", bar, deepest.Format("2006-01-02"))
 		}
+	}
+}
+
+// TestLiveMarkAndIndexCandles 实拉标记价与指数价，并验证它们确实是【另外两条】
+// 序列，而不是成交价的别名。
+//
+// 这条测试的重点不是「接口能调通」，而是标记价【比成交价平稳】——那正是回测里
+// 必须用它的理由：用成交价，影线会制造出真实不会发生的强平。
+func TestLiveMarkAndIndexCandles(t *testing.T) {
+	trades := liveSource(t)
+	mark, err := okxsource.New(liveClient(t), okxsource.MarkPrice)
+	if err != nil {
+		t.Fatal(err)
+	}
+	index, err := okxsource.New(liveClient(t), okxsource.IndexPrice)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	p := tickflow.MustParsePeriod("1H")
+	now := time.Now().UnixMilli()
+	to := p.Truncate(now)
+	from := to - 200*p.Step().Milliseconds()
+	ctx := context.Background()
+
+	get := func(src *okxsource.Source, inst string) []tickflow.Candle {
+		t.Helper()
+		cs, err := src.Fetch(ctx, tickflow.FetchRequest{InstID: inst, Bar: "1H", From: from, To: to})
+		if err != nil {
+			t.Fatalf("%s 拉取失败: %v", src.Series(), err)
+		}
+		if len(cs) == 0 {
+			t.Fatalf("%s 一根都没拉到", src.Series())
+		}
+		if badTs, ok := tickflow.VerifyAlignment(p, cs); !ok {
+			t.Fatalf("%s 的 %d 没落在网格上", src.Series(), badTs)
+		}
+		return cs
+	}
+
+	tc := get(trades, "BTC-USDT-SWAP")
+	mc := get(mark, "BTC-USDT-SWAP")
+	ic := get(index, "BTC-USDT") // 指数用现货形式的 instId
+
+	t.Logf("成交价 %d 根、标记价 %d 根、指数价 %d 根", len(tc), len(mc), len(ic))
+
+	// 标记价与指数价没有成交量——上游文档这么写的，这里当场确认。
+	for _, c := range mc {
+		if c.Vol != 0 || c.VolCcy != 0 || c.VolCcyQuote != 0 {
+			t.Fatalf("标记价 K 线不该有成交量：%+v", c)
+			break
+		}
+	}
+
+	// 按 ts 对齐，比较两条序列的振幅。
+	byTs := map[int64]tickflow.Candle{}
+	for _, c := range mc {
+		byTs[c.Ts] = c
+	}
+	var paired, markNarrower int
+	var sumT, sumM float64
+	for _, c := range tc {
+		m, ok := byTs[c.Ts]
+		if !ok {
+			continue
+		}
+		paired++
+		rt := (c.High - c.Low) / c.Close
+		rm := (m.High - m.Low) / m.Close
+		sumT, sumM = sumT+rt, sumM+rm
+		if rm < rt {
+			markNarrower++
+		}
+		// 标记价与成交价必须是【不同】的数——相等说明拿错了端点。
+		if paired < 5 && c.Close == m.Close && c.High == m.High && c.Low == m.Low {
+			t.Errorf("%d 处标记价与成交价完全相同，多半是端点搞错了", c.Ts)
+		}
+	}
+	if paired < 50 {
+		t.Fatalf("只对上 %d 根，样本太少", paired)
+	}
+	t.Logf("对齐 %d 根：平均振幅 成交价 %.4f%% / 标记价 %.4f%%，标记价更窄的占 %d/%d",
+		paired, sumT/float64(paired)*100, sumM/float64(paired)*100, markNarrower, paired)
+
+	if sumM >= sumT {
+		t.Errorf("标记价的平均振幅没有比成交价小——它本该由指数价平滑而来。"+
+			"成交价 %.6f，标记价 %.6f", sumT/float64(paired), sumM/float64(paired))
 	}
 }

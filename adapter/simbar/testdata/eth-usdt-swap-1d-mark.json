@@ -1,0 +1,5002 @@
+[
+ {
+  "Ts": 1744992000000,
+  "Open": 1583.01,
+  "High": 1613.42,
+  "Low": 1581.62,
+  "Close": 1607.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745078400000,
+  "Open": 1607.28,
+  "High": 1632.28,
+  "Low": 1565.5,
+  "Close": 1573.75,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745164800000,
+  "Open": 1573.76,
+  "High": 1658.5,
+  "Low": 1571.57,
+  "Close": 1623.41,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745251200000,
+  "Open": 1623.41,
+  "High": 1726.04,
+  "Low": 1536.96,
+  "Close": 1703.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745337600000,
+  "Open": 1703.37,
+  "High": 1834.8,
+  "Low": 1683.97,
+  "Close": 1795.03,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745424000000,
+  "Open": 1795.03,
+  "High": 1810.21,
+  "Low": 1722.77,
+  "Close": 1764.23,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745510400000,
+  "Open": 1764.23,
+  "High": 1826.42,
+  "Low": 1737.96,
+  "Close": 1805.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745596800000,
+  "Open": 1805.81,
+  "High": 1839.87,
+  "Low": 1778.67,
+  "Close": 1799.5,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745683200000,
+  "Open": 1799.5,
+  "High": 1856.6,
+  "Low": 1781.54,
+  "Close": 1793.03,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745769600000,
+  "Open": 1793.03,
+  "High": 1826.39,
+  "Low": 1751.75,
+  "Close": 1762.54,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745856000000,
+  "Open": 1762.54,
+  "High": 1841.93,
+  "Low": 1744.23,
+  "Close": 1814.17,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1745942400000,
+  "Open": 1814.17,
+  "High": 1831.51,
+  "Low": 1730.78,
+  "Close": 1763.83,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746028800000,
+  "Open": 1763.81,
+  "High": 1872.53,
+  "Low": 1755.22,
+  "Close": 1852.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746115200000,
+  "Open": 1852.11,
+  "High": 1869.66,
+  "Low": 1812.28,
+  "Close": 1840.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746201600000,
+  "Open": 1840.18,
+  "High": 1869.75,
+  "Low": 1816.33,
+  "Close": 1833.34,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746288000000,
+  "Open": 1833.34,
+  "High": 1849.27,
+  "Low": 1809.15,
+  "Close": 1829.89,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746374400000,
+  "Open": 1829.89,
+  "High": 1841.71,
+  "Low": 1780.39,
+  "Close": 1800.36,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746460800000,
+  "Open": 1800.36,
+  "High": 1832.46,
+  "Low": 1750.83,
+  "Close": 1769.3,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746547200000,
+  "Open": 1769.3,
+  "High": 1849.55,
+  "Low": 1761.3,
+  "Close": 1816.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746633600000,
+  "Open": 1816.69,
+  "High": 2075.25,
+  "Low": 1786.33,
+  "Close": 2050.64,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746720000000,
+  "Open": 2050.64,
+  "High": 2489.48,
+  "Low": 2035.61,
+  "Close": 2300.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746806400000,
+  "Open": 2300.71,
+  "High": 2446.74,
+  "Low": 2274.55,
+  "Close": 2432.47,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746892800000,
+  "Open": 2432.4,
+  "High": 2605.75,
+  "Low": 2427.41,
+  "Close": 2461.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1746979200000,
+  "Open": 2461.09,
+  "High": 2622.14,
+  "Low": 2438.9,
+  "Close": 2487.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747065600000,
+  "Open": 2486.82,
+  "High": 2572.96,
+  "Low": 2406.92,
+  "Close": 2564.22,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747152000000,
+  "Open": 2564.22,
+  "High": 2738.51,
+  "Low": 2557.95,
+  "Close": 2595.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747238400000,
+  "Open": 2595.94,
+  "High": 2646.37,
+  "Low": 2477.7,
+  "Close": 2562.85,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747324800000,
+  "Open": 2562.85,
+  "High": 2647.17,
+  "Low": 2510.71,
+  "Close": 2593.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747411200000,
+  "Open": 2593.88,
+  "High": 2601.12,
+  "Low": 2446.02,
+  "Close": 2473.75,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747497600000,
+  "Open": 2473.75,
+  "High": 2586.48,
+  "Low": 2447.41,
+  "Close": 2578.33,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747584000000,
+  "Open": 2578.33,
+  "High": 2583.38,
+  "Low": 2317.71,
+  "Close": 2465.15,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747670400000,
+  "Open": 2465.15,
+  "High": 2586.79,
+  "Low": 2449.79,
+  "Close": 2481.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747756800000,
+  "Open": 2481.48,
+  "High": 2614.28,
+  "Low": 2442.27,
+  "Close": 2565.86,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747843200000,
+  "Open": 2565.86,
+  "High": 2691.83,
+  "Low": 2451.11,
+  "Close": 2663.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1747929600000,
+  "Open": 2663.21,
+  "High": 2732.83,
+  "Low": 2498.94,
+  "Close": 2566.91,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748016000000,
+  "Open": 2566.92,
+  "High": 2586.22,
+  "Low": 2502.69,
+  "Close": 2554.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748102400000,
+  "Open": 2554.48,
+  "High": 2566.18,
+  "Low": 2462.72,
+  "Close": 2510.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748188800000,
+  "Open": 2510.28,
+  "High": 2598.05,
+  "Low": 2494.94,
+  "Close": 2564.53,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748275200000,
+  "Open": 2564.64,
+  "High": 2682.86,
+  "Low": 2509,
+  "Close": 2666.83,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748361600000,
+  "Open": 2666.83,
+  "High": 2711.35,
+  "Low": 2608,
+  "Close": 2625.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748448000000,
+  "Open": 2625.7,
+  "High": 2788,
+  "Low": 2611.53,
+  "Close": 2642.49,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748534400000,
+  "Open": 2642.49,
+  "High": 2672.24,
+  "Low": 2557.15,
+  "Close": 2596.92,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748620800000,
+  "Open": 2596.92,
+  "High": 2603.07,
+  "Low": 2476.21,
+  "Close": 2535.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748707200000,
+  "Open": 2535.27,
+  "High": 2549.29,
+  "Low": 2467.39,
+  "Close": 2521.92,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748793600000,
+  "Open": 2521.92,
+  "High": 2554.31,
+  "Low": 2473.82,
+  "Close": 2542.89,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748880000000,
+  "Open": 2542.89,
+  "High": 2653.53,
+  "Low": 2523.78,
+  "Close": 2622.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1748966400000,
+  "Open": 2622.57,
+  "High": 2678.38,
+  "Low": 2577.81,
+  "Close": 2666.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749052800000,
+  "Open": 2666.81,
+  "High": 2668.17,
+  "Low": 2561.65,
+  "Close": 2588.32,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749139200000,
+  "Open": 2588.32,
+  "High": 2590.69,
+  "Low": 2382.83,
+  "Close": 2508.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749225600000,
+  "Open": 2508.37,
+  "High": 2522.21,
+  "Low": 2455.92,
+  "Close": 2518.13,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749312000000,
+  "Open": 2518.13,
+  "High": 2542.91,
+  "Low": 2490.01,
+  "Close": 2513.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749398400000,
+  "Open": 2513.11,
+  "High": 2548.31,
+  "Low": 2476.71,
+  "Close": 2532.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749484800000,
+  "Open": 2532.87,
+  "High": 2797.85,
+  "Low": 2532.83,
+  "Close": 2731.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749571200000,
+  "Open": 2731.67,
+  "High": 2877.91,
+  "Low": 2727.37,
+  "Close": 2863.79,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749657600000,
+  "Open": 2863.77,
+  "High": 2874.16,
+  "Low": 2711.18,
+  "Close": 2718.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749744000000,
+  "Open": 2718.45,
+  "High": 2769.84,
+  "Low": 2436.59,
+  "Close": 2550.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749830400000,
+  "Open": 2550.06,
+  "High": 2584.11,
+  "Low": 2503.86,
+  "Close": 2518.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1749916800000,
+  "Open": 2518.27,
+  "High": 2553.81,
+  "Low": 2487.56,
+  "Close": 2540.41,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750003200000,
+  "Open": 2540.41,
+  "High": 2656.53,
+  "Low": 2490.38,
+  "Close": 2630.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750089600000,
+  "Open": 2630.57,
+  "High": 2679.14,
+  "Low": 2480.96,
+  "Close": 2497.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750176000000,
+  "Open": 2497.51,
+  "High": 2547.67,
+  "Low": 2452.6,
+  "Close": 2507.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750262400000,
+  "Open": 2507.71,
+  "High": 2545.85,
+  "Low": 2466.05,
+  "Close": 2491.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750348800000,
+  "Open": 2491.99,
+  "High": 2567.94,
+  "Low": 2483.7,
+  "Close": 2492.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750435200000,
+  "Open": 2492.53,
+  "High": 2495.37,
+  "Low": 2364.69,
+  "Close": 2422.49,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750521600000,
+  "Open": 2422.49,
+  "High": 2427.33,
+  "Low": 2154.77,
+  "Close": 2174.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750608000000,
+  "Open": 2174.27,
+  "High": 2313.09,
+  "Low": 2111.21,
+  "Close": 2247.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750694400000,
+  "Open": 2247.63,
+  "High": 2453.18,
+  "Low": 2187.5,
+  "Close": 2436.75,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750780800000,
+  "Open": 2436.75,
+  "High": 2481.46,
+  "Low": 2388.34,
+  "Close": 2404.53,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750867200000,
+  "Open": 2404.53,
+  "High": 2519.34,
+  "Low": 2400.23,
+  "Close": 2432.14,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1750953600000,
+  "Open": 2432.14,
+  "High": 2462.57,
+  "Low": 2379.97,
+  "Close": 2437.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751040000000,
+  "Open": 2437.06,
+  "High": 2448.67,
+  "Low": 2386.77,
+  "Close": 2434.73,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751126400000,
+  "Open": 2434.73,
+  "High": 2462.56,
+  "Low": 2423.38,
+  "Close": 2435.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751212800000,
+  "Open": 2435.62,
+  "High": 2524.06,
+  "Low": 2410.08,
+  "Close": 2473.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751299200000,
+  "Open": 2473.18,
+  "High": 2520.93,
+  "Low": 2405.42,
+  "Close": 2422.2,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751385600000,
+  "Open": 2422.2,
+  "High": 2500.97,
+  "Low": 2371.8,
+  "Close": 2497.83,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751472000000,
+  "Open": 2497.83,
+  "High": 2634.01,
+  "Low": 2493.66,
+  "Close": 2569.34,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751558400000,
+  "Open": 2569.34,
+  "High": 2602.86,
+  "Low": 2497.17,
+  "Close": 2499.77,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751644800000,
+  "Open": 2499.77,
+  "High": 2528.34,
+  "Low": 2473.05,
+  "Close": 2506.8,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751731200000,
+  "Open": 2506.8,
+  "High": 2569.33,
+  "Low": 2486.59,
+  "Close": 2557.24,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751817600000,
+  "Open": 2557.27,
+  "High": 2604.65,
+  "Low": 2522.9,
+  "Close": 2532.56,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751904000000,
+  "Open": 2532.56,
+  "High": 2599.71,
+  "Low": 2511.27,
+  "Close": 2563.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1751990400000,
+  "Open": 2563.7,
+  "High": 2673.76,
+  "Low": 2558.59,
+  "Close": 2655.33,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752076800000,
+  "Open": 2655.32,
+  "High": 2821.96,
+  "Low": 2650.74,
+  "Close": 2768.25,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752163200000,
+  "Open": 2768.25,
+  "High": 3039.54,
+  "Low": 2767.54,
+  "Close": 2951.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752249600000,
+  "Open": 2951.31,
+  "High": 3009.81,
+  "Low": 2903.92,
+  "Close": 2915.89,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752336000000,
+  "Open": 2915.89,
+  "High": 3019.22,
+  "Low": 2910.3,
+  "Close": 2991.31,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752422400000,
+  "Open": 2991.31,
+  "High": 3083.83,
+  "Low": 2938.6,
+  "Close": 3013.41,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752508800000,
+  "Open": 3013.41,
+  "High": 3067.71,
+  "Low": 2932,
+  "Close": 3039.65,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752595200000,
+  "Open": 3039.65,
+  "High": 3266.69,
+  "Low": 3030.38,
+  "Close": 3244.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752681600000,
+  "Open": 3244.2,
+  "High": 3479.99,
+  "Low": 3234.46,
+  "Close": 3420.54,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752768000000,
+  "Open": 3420.54,
+  "High": 3674.85,
+  "Low": 3366.04,
+  "Close": 3565.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752854400000,
+  "Open": 3565.62,
+  "High": 3625.49,
+  "Low": 3478.39,
+  "Close": 3552.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1752940800000,
+  "Open": 3552.6,
+  "High": 3789.69,
+  "Low": 3532.84,
+  "Close": 3785.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753027200000,
+  "Open": 3785.48,
+  "High": 3859.68,
+  "Low": 3682.62,
+  "Close": 3812,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753113600000,
+  "Open": 3812,
+  "High": 3819.44,
+  "Low": 3620.01,
+  "Close": 3719.68,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753200000000,
+  "Open": 3719.68,
+  "High": 3764.97,
+  "Low": 3579.26,
+  "Close": 3646.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753286400000,
+  "Open": 3645.87,
+  "High": 3771.24,
+  "Low": 3507.35,
+  "Close": 3730.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753372800000,
+  "Open": 3730.09,
+  "High": 3754.6,
+  "Low": 3573,
+  "Close": 3633.03,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753459200000,
+  "Open": 3633.02,
+  "High": 3782.48,
+  "Low": 3615.51,
+  "Close": 3734.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753545600000,
+  "Open": 3734.58,
+  "High": 3839.76,
+  "Low": 3709.17,
+  "Close": 3818.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753632000000,
+  "Open": 3818.27,
+  "High": 3940.9,
+  "Low": 3773.22,
+  "Close": 3806.4,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753718400000,
+  "Open": 3806.41,
+  "High": 3885.41,
+  "Low": 3730.04,
+  "Close": 3760.72,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753804800000,
+  "Open": 3760.72,
+  "High": 3832.64,
+  "Low": 3715.59,
+  "Close": 3795.78,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753891200000,
+  "Open": 3795.79,
+  "High": 3876.72,
+  "Low": 3675.37,
+  "Close": 3786.15,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1753977600000,
+  "Open": 3786.15,
+  "High": 3816.7,
+  "Low": 3562.86,
+  "Close": 3614.08,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754064000000,
+  "Open": 3614.09,
+  "High": 3632.37,
+  "Low": 3428.64,
+  "Close": 3457.9,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754150400000,
+  "Open": 3457.9,
+  "High": 3514.74,
+  "Low": 3355.35,
+  "Close": 3474.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754236800000,
+  "Open": 3474.62,
+  "High": 3663.55,
+  "Low": 3465.59,
+  "Close": 3646.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754323200000,
+  "Open": 3646.62,
+  "High": 3735.17,
+  "Low": 3555.34,
+  "Close": 3569.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754409600000,
+  "Open": 3569.54,
+  "High": 3668.07,
+  "Low": 3544.19,
+  "Close": 3662.79,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754496000000,
+  "Open": 3662.79,
+  "High": 3864.57,
+  "Low": 3637,
+  "Close": 3834.61,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754582400000,
+  "Open": 3834.61,
+  "High": 4011.56,
+  "Low": 3779.2,
+  "Close": 3953.15,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754668800000,
+  "Open": 3953.15,
+  "High": 4246.99,
+  "Low": 3948.61,
+  "Close": 4209.04,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754755200000,
+  "Open": 4209.04,
+  "High": 4334.01,
+  "Low": 4161.43,
+  "Close": 4217.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754841600000,
+  "Open": 4217.66,
+  "High": 4349.5,
+  "Low": 4165.78,
+  "Close": 4328.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1754928000000,
+  "Open": 4328.93,
+  "High": 4478.49,
+  "Low": 4188.57,
+  "Close": 4470.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755014400000,
+  "Open": 4470.19,
+  "High": 4737.45,
+  "Low": 4438.94,
+  "Close": 4665.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755100800000,
+  "Open": 4665.1,
+  "High": 4794.2,
+  "Low": 4457.45,
+  "Close": 4620.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755187200000,
+  "Open": 4620.43,
+  "High": 4668.07,
+  "Low": 4394.33,
+  "Close": 4429.98,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755273600000,
+  "Open": 4429.98,
+  "High": 4489.98,
+  "Low": 4366.26,
+  "Close": 4399.36,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755360000000,
+  "Open": 4399.36,
+  "High": 4574.13,
+  "Low": 4388.65,
+  "Close": 4559.44,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755446400000,
+  "Open": 4559.43,
+  "High": 4564.35,
+  "Low": 4224.05,
+  "Close": 4344.04,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755532800000,
+  "Open": 4344.04,
+  "High": 4386.49,
+  "Low": 4168.98,
+  "Close": 4190.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755619200000,
+  "Open": 4190.38,
+  "High": 4305.42,
+  "Low": 4062.55,
+  "Close": 4253.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755705600000,
+  "Open": 4253.52,
+  "High": 4376.04,
+  "Low": 4225.37,
+  "Close": 4241.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755792000000,
+  "Open": 4241.69,
+  "High": 4667.21,
+  "Low": 4202.71,
+  "Close": 4614.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755878400000,
+  "Open": 4614.83,
+  "High": 4887.56,
+  "Low": 4614.83,
+  "Close": 4749.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1755964800000,
+  "Open": 4749.62,
+  "High": 4828.77,
+  "Low": 4719.15,
+  "Close": 4797.08,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756051200000,
+  "Open": 4797.08,
+  "High": 4956.43,
+  "Low": 4519.71,
+  "Close": 4610.29,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756137600000,
+  "Open": 4610.29,
+  "High": 4643.52,
+  "Low": 4310.35,
+  "Close": 4515.95,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756224000000,
+  "Open": 4515.96,
+  "High": 4660.65,
+  "Low": 4495.97,
+  "Close": 4654.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756310400000,
+  "Open": 4654.37,
+  "High": 4655.17,
+  "Low": 4466.44,
+  "Close": 4502.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756396800000,
+  "Open": 4502.48,
+  "High": 4528.8,
+  "Low": 4264.64,
+  "Close": 4313.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756483200000,
+  "Open": 4313.99,
+  "High": 4412.88,
+  "Low": 4255.96,
+  "Close": 4374.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756569600000,
+  "Open": 4374.94,
+  "High": 4496.47,
+  "Low": 4332.4,
+  "Close": 4482.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756656000000,
+  "Open": 4482.69,
+  "High": 4489.83,
+  "Low": 4343.4,
+  "Close": 4360.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756742400000,
+  "Open": 4360.38,
+  "High": 4414.74,
+  "Low": 4208.27,
+  "Close": 4293.17,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756828800000,
+  "Open": 4293.36,
+  "High": 4483.83,
+  "Low": 4255.5,
+  "Close": 4477.13,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1756915200000,
+  "Open": 4477.12,
+  "High": 4488.6,
+  "Low": 4292.82,
+  "Close": 4302.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757001600000,
+  "Open": 4302.69,
+  "High": 4490.01,
+  "Low": 4253.38,
+  "Close": 4280.98,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757088000000,
+  "Open": 4280.98,
+  "High": 4341.04,
+  "Low": 4261.32,
+  "Close": 4268.01,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757174400000,
+  "Open": 4268.01,
+  "High": 4313.33,
+  "Low": 4233.22,
+  "Close": 4297.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757260800000,
+  "Open": 4297.1,
+  "High": 4382.3,
+  "Low": 4268.39,
+  "Close": 4369.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757347200000,
+  "Open": 4369.99,
+  "High": 4380.29,
+  "Low": 4276.43,
+  "Close": 4284.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757433600000,
+  "Open": 4284.52,
+  "High": 4452.42,
+  "Low": 4277.11,
+  "Close": 4403.39,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757520000000,
+  "Open": 4403.39,
+  "High": 4479.05,
+  "Low": 4299.09,
+  "Close": 4410.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757606400000,
+  "Open": 4410.87,
+  "High": 4570.89,
+  "Low": 4405.71,
+  "Close": 4540.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757692800000,
+  "Open": 4540.98,
+  "High": 4766.12,
+  "Low": 4532.51,
+  "Close": 4655.4,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757779200000,
+  "Open": 4655.4,
+  "High": 4694.01,
+  "Low": 4579.04,
+  "Close": 4584.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757865600000,
+  "Open": 4584.51,
+  "High": 4670.75,
+  "Low": 4464.44,
+  "Close": 4499.34,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1757952000000,
+  "Open": 4499.34,
+  "High": 4536.43,
+  "Low": 4421.28,
+  "Close": 4464.98,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758038400000,
+  "Open": 4464.98,
+  "High": 4553.24,
+  "Low": 4443.8,
+  "Close": 4487.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758124800000,
+  "Open": 4487.57,
+  "High": 4642.85,
+  "Low": 4411.41,
+  "Close": 4596.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758211200000,
+  "Open": 4596.62,
+  "High": 4634.39,
+  "Low": 4443.11,
+  "Close": 4472.59,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758297600000,
+  "Open": 4472.68,
+  "High": 4504.64,
+  "Low": 4432.79,
+  "Close": 4495.72,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758384000000,
+  "Open": 4495.72,
+  "High": 4506.29,
+  "Low": 4442.15,
+  "Close": 4480.24,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758470400000,
+  "Open": 4480.24,
+  "High": 4496.46,
+  "Low": 4039.79,
+  "Close": 4165.74,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758556800000,
+  "Open": 4165.74,
+  "High": 4226.61,
+  "Low": 4112.93,
+  "Close": 4179.07,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758643200000,
+  "Open": 4179.07,
+  "High": 4206.32,
+  "Low": 4071.2,
+  "Close": 4163.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758729600000,
+  "Open": 4163.58,
+  "High": 4191.58,
+  "Low": 3924.41,
+  "Close": 4000.73,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758816000000,
+  "Open": 4000.73,
+  "High": 4003.99,
+  "Low": 3820.62,
+  "Close": 3943.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758902400000,
+  "Open": 3943.94,
+  "High": 4066.59,
+  "Low": 3940.26,
+  "Close": 4016.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1758988800000,
+  "Open": 4016.38,
+  "High": 4031.79,
+  "Low": 3963.77,
+  "Close": 4019.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759075200000,
+  "Open": 4019.21,
+  "High": 4203.11,
+  "Low": 4019.06,
+  "Close": 4163.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759161600000,
+  "Open": 4163.19,
+  "High": 4242.8,
+  "Low": 4092.73,
+  "Close": 4117.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759248000000,
+  "Open": 4117.93,
+  "High": 4341.93,
+  "Low": 4090.7,
+  "Close": 4324.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759334400000,
+  "Open": 4324.69,
+  "High": 4441.14,
+  "Low": 4286.85,
+  "Close": 4434.95,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759420800000,
+  "Open": 4434.95,
+  "High": 4558.46,
+  "Low": 4424.56,
+  "Close": 4532.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759507200000,
+  "Open": 4532.89,
+  "High": 4590.34,
+  "Low": 4439.59,
+  "Close": 4452.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759593600000,
+  "Open": 4452.57,
+  "High": 4617.11,
+  "Low": 4438.76,
+  "Close": 4530.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759680000000,
+  "Open": 4530.87,
+  "High": 4692.73,
+  "Low": 4472.73,
+  "Close": 4671.32,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759766400000,
+  "Open": 4671.32,
+  "High": 4753.92,
+  "Low": 4475.97,
+  "Close": 4510.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759852800000,
+  "Open": 4510.46,
+  "High": 4521.7,
+  "Low": 4409.27,
+  "Close": 4445.14,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1759939200000,
+  "Open": 4445.14,
+  "High": 4556,
+  "Low": 4289.49,
+  "Close": 4312.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760025600000,
+  "Open": 4312.57,
+  "High": 4391.52,
+  "Low": 4070.21,
+  "Close": 4101.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760112000000,
+  "Open": 4101.1,
+  "High": 4135.52,
+  "Low": 3362.6,
+  "Close": 3822.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760198400000,
+  "Open": 3822.57,
+  "High": 4077.01,
+  "Low": 3640.78,
+  "Close": 4031.25,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760284800000,
+  "Open": 4031.27,
+  "High": 4217.56,
+  "Low": 4030.77,
+  "Close": 4133.17,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760371200000,
+  "Open": 4133.17,
+  "High": 4288.36,
+  "Low": 3887.45,
+  "Close": 4082.79,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760457600000,
+  "Open": 4082.69,
+  "High": 4214.55,
+  "Low": 3957.65,
+  "Close": 3979.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760544000000,
+  "Open": 3979.37,
+  "High": 4083.55,
+  "Low": 3890.35,
+  "Close": 3905.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760630400000,
+  "Open": 3905.51,
+  "High": 3964.4,
+  "Low": 3673.25,
+  "Close": 3795.55,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760716800000,
+  "Open": 3795.44,
+  "High": 3925.93,
+  "Low": 3777.01,
+  "Close": 3875.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760803200000,
+  "Open": 3875.88,
+  "High": 3999.3,
+  "Low": 3824.86,
+  "Close": 3977.35,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760889600000,
+  "Open": 3977.35,
+  "High": 4081.88,
+  "Low": 3906.78,
+  "Close": 4002.66,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1760976000000,
+  "Open": 4002.67,
+  "High": 4083.7,
+  "Low": 3838.7,
+  "Close": 4080.03,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761062400000,
+  "Open": 4080.03,
+  "High": 4108.77,
+  "Low": 3770.05,
+  "Close": 3839.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761148800000,
+  "Open": 3839.06,
+  "High": 3903.38,
+  "Low": 3707.68,
+  "Close": 3874.8,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761235200000,
+  "Open": 3874.8,
+  "High": 4024.59,
+  "Low": 3817.36,
+  "Close": 3887.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761321600000,
+  "Open": 3887.19,
+  "High": 3958.22,
+  "Low": 3864.32,
+  "Close": 3931.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761408000000,
+  "Open": 3931.63,
+  "High": 4097.95,
+  "Low": 3917.39,
+  "Close": 4072.98,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761494400000,
+  "Open": 4072.98,
+  "High": 4251.54,
+  "Low": 4044.62,
+  "Close": 4170.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761580800000,
+  "Open": 4170.94,
+  "High": 4231.25,
+  "Low": 4064.63,
+  "Close": 4095.26,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761667200000,
+  "Open": 4095.26,
+  "High": 4149.53,
+  "Low": 3928.56,
+  "Close": 3950.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761753600000,
+  "Open": 3950.38,
+  "High": 4017.13,
+  "Low": 3756.01,
+  "Close": 3771.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761840000000,
+  "Open": 3771.75,
+  "High": 3885.34,
+  "Low": 3676.53,
+  "Close": 3858,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1761926400000,
+  "Open": 3858,
+  "High": 3904.59,
+  "Low": 3803.38,
+  "Close": 3892.49,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762012800000,
+  "Open": 3892.49,
+  "High": 3916.6,
+  "Low": 3837.35,
+  "Close": 3851.49,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762099200000,
+  "Open": 3851.49,
+  "High": 3914.27,
+  "Low": 3580.1,
+  "Close": 3587.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762185600000,
+  "Open": 3587.28,
+  "High": 3680.12,
+  "Low": 3459.66,
+  "Close": 3505.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762272000000,
+  "Open": 3505.71,
+  "High": 3519.5,
+  "Low": 3055.31,
+  "Close": 3395.65,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762358400000,
+  "Open": 3395.65,
+  "High": 3478.25,
+  "Low": 3277.11,
+  "Close": 3298.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762444800000,
+  "Open": 3298.83,
+  "High": 3368.19,
+  "Low": 3193.13,
+  "Close": 3295.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762531200000,
+  "Open": 3295.6,
+  "High": 3485.21,
+  "Low": 3272.59,
+  "Close": 3375.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762617600000,
+  "Open": 3375.81,
+  "High": 3561.88,
+  "Low": 3354.5,
+  "Close": 3513.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762704000000,
+  "Open": 3513.38,
+  "High": 3657.24,
+  "Low": 3499.19,
+  "Close": 3518.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762790400000,
+  "Open": 3518.57,
+  "High": 3646.7,
+  "Low": 3466.97,
+  "Close": 3479.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762876800000,
+  "Open": 3479.46,
+  "High": 3586.69,
+  "Low": 3403.16,
+  "Close": 3426.54,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1762963200000,
+  "Open": 3426.54,
+  "High": 3563.72,
+  "Low": 3365.14,
+  "Close": 3385.45,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763049600000,
+  "Open": 3385.45,
+  "High": 3397.23,
+  "Low": 3068.31,
+  "Close": 3195.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763136000000,
+  "Open": 3195.6,
+  "High": 3255.61,
+  "Low": 3087.99,
+  "Close": 3184.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763222400000,
+  "Open": 3184.46,
+  "High": 3247.44,
+  "Low": 3096.6,
+  "Close": 3104.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763308800000,
+  "Open": 3104.21,
+  "High": 3221.19,
+  "Low": 3001.85,
+  "Close": 3118.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763395200000,
+  "Open": 3118.96,
+  "High": 3141.33,
+  "Low": 2945.3,
+  "Close": 3105.05,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763481600000,
+  "Open": 3105.05,
+  "High": 3168.6,
+  "Low": 2965.83,
+  "Close": 2972.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763568000000,
+  "Open": 2971.98,
+  "High": 3062.24,
+  "Low": 2872.24,
+  "Close": 2954.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763654400000,
+  "Open": 2954.48,
+  "High": 2960.26,
+  "Low": 2621.31,
+  "Close": 2703.83,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763740800000,
+  "Open": 2703.9,
+  "High": 2805.37,
+  "Low": 2674.14,
+  "Close": 2737.5,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763827200000,
+  "Open": 2737.53,
+  "High": 2856.85,
+  "Low": 2732.08,
+  "Close": 2834.79,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1763913600000,
+  "Open": 2834.79,
+  "High": 2884.45,
+  "Low": 2761.82,
+  "Close": 2844.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764000000000,
+  "Open": 2844.84,
+  "High": 2983.46,
+  "Low": 2841.43,
+  "Close": 2894.17,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764086400000,
+  "Open": 2894.19,
+  "High": 2982.19,
+  "Low": 2870.13,
+  "Close": 2926.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764172800000,
+  "Open": 2926.61,
+  "High": 3069.31,
+  "Low": 2925.23,
+  "Close": 3009.55,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764259200000,
+  "Open": 3009.54,
+  "High": 3096.97,
+  "Low": 2992.66,
+  "Close": 3071.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764345600000,
+  "Open": 3071.94,
+  "High": 3072.44,
+  "Low": 2984.61,
+  "Close": 3006.25,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764432000000,
+  "Open": 3006.25,
+  "High": 3051.12,
+  "Low": 2960.95,
+  "Close": 3027.83,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764518400000,
+  "Open": 3027.83,
+  "High": 3048.3,
+  "Low": 2718.24,
+  "Close": 2744.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764604800000,
+  "Open": 2744.73,
+  "High": 3024.35,
+  "Low": 2718.72,
+  "Close": 3005.25,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764691200000,
+  "Open": 3005.25,
+  "High": 3144.32,
+  "Low": 2972.74,
+  "Close": 3084.77,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764777600000,
+  "Open": 3084.77,
+  "High": 3238.56,
+  "Low": 3062.78,
+  "Close": 3206.13,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764864000000,
+  "Open": 3206.13,
+  "High": 3223.75,
+  "Low": 3065.36,
+  "Close": 3104.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1764950400000,
+  "Open": 3104.87,
+  "High": 3107.17,
+  "Low": 2983.27,
+  "Close": 3040.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765036800000,
+  "Open": 3040.11,
+  "High": 3065.24,
+  "Low": 2908.55,
+  "Close": 3025.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765123200000,
+  "Open": 3024.81,
+  "High": 3179.12,
+  "Low": 2998.43,
+  "Close": 3099.66,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765209600000,
+  "Open": 3099.66,
+  "High": 3254.82,
+  "Low": 3076.13,
+  "Close": 3244.45,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765296000000,
+  "Open": 3244.56,
+  "High": 3396.94,
+  "Low": 3244.56,
+  "Close": 3326.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765382400000,
+  "Open": 3326.75,
+  "High": 3445.27,
+  "Low": 3144.81,
+  "Close": 3178.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765468800000,
+  "Open": 3177.89,
+  "High": 3271.67,
+  "Low": 3057.08,
+  "Close": 3069.85,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765555200000,
+  "Open": 3069.85,
+  "High": 3133.71,
+  "Low": 3043.55,
+  "Close": 3108.13,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765641600000,
+  "Open": 3108.13,
+  "High": 3128.14,
+  "Low": 3048.27,
+  "Close": 3083.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765728000000,
+  "Open": 3083.21,
+  "High": 3175.38,
+  "Low": 2984.96,
+  "Close": 3009.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765814400000,
+  "Open": 3009.67,
+  "High": 3016.68,
+  "Low": 2877.22,
+  "Close": 2961.78,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765900800000,
+  "Open": 2961.78,
+  "High": 3029.42,
+  "Low": 2885.22,
+  "Close": 2903.5,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1765987200000,
+  "Open": 2903.46,
+  "High": 2996.44,
+  "Low": 2789.15,
+  "Close": 2964.17,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766073600000,
+  "Open": 2964.22,
+  "High": 3017.7,
+  "Low": 2774.61,
+  "Close": 2963.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766160000000,
+  "Open": 2963.46,
+  "High": 3006.22,
+  "Low": 2934.23,
+  "Close": 2975.89,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766246400000,
+  "Open": 2975.89,
+  "High": 3012.25,
+  "Low": 2942.88,
+  "Close": 2973.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766332800000,
+  "Open": 2973.19,
+  "High": 3076.51,
+  "Low": 2966,
+  "Close": 3051.24,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766419200000,
+  "Open": 3051.24,
+  "High": 3058.35,
+  "Low": 2899.18,
+  "Close": 2926.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766505600000,
+  "Open": 2926.84,
+  "High": 2986.53,
+  "Low": 2887.59,
+  "Close": 2923.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766592000000,
+  "Open": 2923.76,
+  "High": 2969.39,
+  "Low": 2911.55,
+  "Close": 2959.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766678400000,
+  "Open": 2959.16,
+  "High": 2993,
+  "Low": 2889.3,
+  "Close": 2921.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766764800000,
+  "Open": 2921.6,
+  "High": 2939.33,
+  "Low": 2905.49,
+  "Close": 2925.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766851200000,
+  "Open": 2925.69,
+  "High": 2959.67,
+  "Low": 2916.21,
+  "Close": 2947.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1766937600000,
+  "Open": 2947.71,
+  "High": 3055.41,
+  "Low": 2908.91,
+  "Close": 2933.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767024000000,
+  "Open": 2933.93,
+  "High": 3008.17,
+  "Low": 2911.69,
+  "Close": 2987.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767110400000,
+  "Open": 2987.96,
+  "High": 3026.18,
+  "Low": 2943.71,
+  "Close": 2984.08,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767196800000,
+  "Open": 2984.08,
+  "High": 2996.59,
+  "Low": 2958.84,
+  "Close": 2988.45,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767283200000,
+  "Open": 2988.45,
+  "High": 3107.37,
+  "Low": 2979.25,
+  "Close": 3085.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767369600000,
+  "Open": 3085.28,
+  "High": 3148.23,
+  "Low": 3074.96,
+  "Close": 3099.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767456000000,
+  "Open": 3099.52,
+  "High": 3165.71,
+  "Low": 3096.23,
+  "Close": 3134.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767542400000,
+  "Open": 3134.19,
+  "High": 3219.79,
+  "Low": 3117.67,
+  "Close": 3194.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767628800000,
+  "Open": 3194.38,
+  "High": 3307.92,
+  "Low": 3157.76,
+  "Close": 3271.04,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767715200000,
+  "Open": 3271.04,
+  "High": 3299.86,
+  "Low": 3143.49,
+  "Close": 3163.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767801600000,
+  "Open": 3163.11,
+  "High": 3182.72,
+  "Low": 3053.06,
+  "Close": 3102.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767888000000,
+  "Open": 3102.73,
+  "High": 3146.83,
+  "Low": 3058.01,
+  "Close": 3110.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1767974400000,
+  "Open": 3110.95,
+  "High": 3143.69,
+  "Low": 3064.55,
+  "Close": 3093.85,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768060800000,
+  "Open": 3093.85,
+  "High": 3129.96,
+  "Low": 3077.11,
+  "Close": 3116.86,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768147200000,
+  "Open": 3116.86,
+  "High": 3170.68,
+  "Low": 3063.98,
+  "Close": 3128.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768233600000,
+  "Open": 3128.84,
+  "High": 3187.5,
+  "Low": 3083.03,
+  "Close": 3182.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768320000000,
+  "Open": 3182.67,
+  "High": 3385.79,
+  "Low": 3170.04,
+  "Close": 3344.23,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768406400000,
+  "Open": 3344.22,
+  "High": 3400.91,
+  "Low": 3275.99,
+  "Close": 3331.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768492800000,
+  "Open": 3331.12,
+  "High": 3336.46,
+  "Low": 3251.93,
+  "Close": 3263.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768579200000,
+  "Open": 3263.19,
+  "High": 3328.55,
+  "Low": 3258.45,
+  "Close": 3328.29,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768665600000,
+  "Open": 3328.29,
+  "High": 3347.14,
+  "Low": 3294.88,
+  "Close": 3332.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768752000000,
+  "Open": 3332.37,
+  "High": 3367.94,
+  "Low": 3175.37,
+  "Close": 3214.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768838400000,
+  "Open": 3214.19,
+  "High": 3225.66,
+  "Low": 2994.06,
+  "Close": 3030.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1768924800000,
+  "Open": 3030.96,
+  "High": 3041.25,
+  "Low": 2901.45,
+  "Close": 3001.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769011200000,
+  "Open": 3001.1,
+  "High": 3067.93,
+  "Low": 2864.21,
+  "Close": 2940.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769097600000,
+  "Open": 2940.17,
+  "High": 2983.32,
+  "Low": 2890.3,
+  "Close": 2951.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769184000000,
+  "Open": 2951.16,
+  "High": 3017.81,
+  "Low": 2930.08,
+  "Close": 2955.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769270400000,
+  "Open": 2955.11,
+  "High": 2966.98,
+  "Low": 2919.68,
+  "Close": 2925.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769356800000,
+  "Open": 2925.71,
+  "High": 2949.61,
+  "Low": 2785.08,
+  "Close": 2898.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769443200000,
+  "Open": 2898.11,
+  "High": 2955.11,
+  "Low": 2885.07,
+  "Close": 2935.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769529600000,
+  "Open": 2935.93,
+  "High": 3044.2,
+  "Low": 2916.54,
+  "Close": 3006.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769616000000,
+  "Open": 3006.31,
+  "High": 3037.31,
+  "Low": 2795.56,
+  "Close": 2822.82,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769702400000,
+  "Open": 2822.82,
+  "High": 2858.46,
+  "Low": 2682.35,
+  "Close": 2727.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769788800000,
+  "Open": 2727.44,
+  "High": 2759.91,
+  "Low": 2506.54,
+  "Close": 2532.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769875200000,
+  "Open": 2532.63,
+  "High": 2549.43,
+  "Low": 2241.64,
+  "Close": 2314.22,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1769961600000,
+  "Open": 2314.22,
+  "High": 2394.99,
+  "Low": 2157,
+  "Close": 2371.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770048000000,
+  "Open": 2371.13,
+  "High": 2385.79,
+  "Low": 2251.79,
+  "Close": 2302.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770134400000,
+  "Open": 2302.29,
+  "High": 2342.57,
+  "Low": 2109.39,
+  "Close": 2150.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770220800000,
+  "Open": 2150.24,
+  "High": 2193.64,
+  "Low": 1926.03,
+  "Close": 1959.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770307200000,
+  "Open": 1959.58,
+  "High": 2017.08,
+  "Low": 1744.38,
+  "Close": 1979.25,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770393600000,
+  "Open": 1979.25,
+  "High": 2117.78,
+  "Low": 1970.65,
+  "Close": 2051.4,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770480000000,
+  "Open": 2051.42,
+  "High": 2143.77,
+  "Low": 2005.05,
+  "Close": 2107.61,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770566400000,
+  "Open": 2107.61,
+  "High": 2150.62,
+  "Low": 2007.92,
+  "Close": 2061.07,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770652800000,
+  "Open": 2061.06,
+  "High": 2146.55,
+  "Low": 1988.72,
+  "Close": 2021.75,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770739200000,
+  "Open": 2021.75,
+  "High": 2045.73,
+  "Low": 1901.62,
+  "Close": 1928.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770825600000,
+  "Open": 1928.21,
+  "High": 1999.96,
+  "Low": 1908.19,
+  "Close": 1947.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770912000000,
+  "Open": 1947.67,
+  "High": 2049.64,
+  "Low": 1896.66,
+  "Close": 2034.26,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1770998400000,
+  "Open": 2034.26,
+  "High": 2106.44,
+  "Low": 2030.15,
+  "Close": 2086.4,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771084800000,
+  "Open": 2086.4,
+  "High": 2102.6,
+  "Low": 1992.18,
+  "Close": 2010.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771171200000,
+  "Open": 2010.46,
+  "High": 2022.37,
+  "Low": 1927.93,
+  "Close": 1955.56,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771257600000,
+  "Open": 1955.58,
+  "High": 2008.06,
+  "Low": 1940.23,
+  "Close": 1967.64,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771344000000,
+  "Open": 1967.64,
+  "High": 2038.15,
+  "Low": 1952.57,
+  "Close": 1984.44,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771430400000,
+  "Open": 1984.44,
+  "High": 1986.7,
+  "Low": 1911.42,
+  "Close": 1925.47,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771516800000,
+  "Open": 1925.46,
+  "High": 1979.8,
+  "Low": 1905.95,
+  "Close": 1963.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771603200000,
+  "Open": 1963.1,
+  "High": 1995.24,
+  "Low": 1938.28,
+  "Close": 1987.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771689600000,
+  "Open": 1987.12,
+  "High": 1994.44,
+  "Low": 1942.94,
+  "Close": 1952.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771776000000,
+  "Open": 1952.93,
+  "High": 1959.93,
+  "Low": 1845.37,
+  "Close": 1894.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771862400000,
+  "Open": 1894.96,
+  "High": 1899.34,
+  "Low": 1797.74,
+  "Close": 1846.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1771948800000,
+  "Open": 1846.16,
+  "High": 2026.35,
+  "Low": 1837.16,
+  "Close": 2013.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772035200000,
+  "Open": 2013.18,
+  "High": 2149.47,
+  "Low": 2010.82,
+  "Close": 2032.44,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772121600000,
+  "Open": 2032.53,
+  "High": 2062.66,
+  "Low": 1938.92,
+  "Close": 1947.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772208000000,
+  "Open": 1947.49,
+  "High": 1947.89,
+  "Low": 1834.51,
+  "Close": 1897.64,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772294400000,
+  "Open": 1897.64,
+  "High": 2054.16,
+  "Low": 1886.12,
+  "Close": 1992.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772380800000,
+  "Open": 1992.16,
+  "High": 2064.48,
+  "Low": 1906.32,
+  "Close": 2046.33,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772467200000,
+  "Open": 2046.33,
+  "High": 2087.61,
+  "Low": 1927.79,
+  "Close": 1968.04,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772553600000,
+  "Open": 1968.04,
+  "High": 2156.96,
+  "Low": 1943.82,
+  "Close": 2149.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772640000000,
+  "Open": 2149.69,
+  "High": 2198.91,
+  "Low": 2066.4,
+  "Close": 2085.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772726400000,
+  "Open": 2085.93,
+  "High": 2098.67,
+  "Low": 1964.96,
+  "Close": 1976.53,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772812800000,
+  "Open": 1976.53,
+  "High": 1995.06,
+  "Low": 1954.83,
+  "Close": 1980.3,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772899200000,
+  "Open": 1980.3,
+  "High": 1982.94,
+  "Low": 1923.47,
+  "Close": 1942.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1772985600000,
+  "Open": 1942.12,
+  "High": 2031.94,
+  "Low": 1909.33,
+  "Close": 2021.66,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773072000000,
+  "Open": 2021.66,
+  "High": 2085.23,
+  "Low": 1988.73,
+  "Close": 2078.73,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773158400000,
+  "Open": 2078.73,
+  "High": 2087.6,
+  "Low": 2006.22,
+  "Close": 2049.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773244800000,
+  "Open": 2049.03,
+  "High": 2094.67,
+  "Low": 2016.93,
+  "Close": 2071.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773331200000,
+  "Open": 2071.51,
+  "High": 2206.58,
+  "Low": 2043.92,
+  "Close": 2127.2,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773417600000,
+  "Open": 2127.2,
+  "High": 2142.59,
+  "Low": 2060.63,
+  "Close": 2073.55,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773504000000,
+  "Open": 2073.55,
+  "High": 2122.44,
+  "Low": 2068.03,
+  "Close": 2092.95,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773590400000,
+  "Open": 2092.95,
+  "High": 2307.11,
+  "Low": 2087.65,
+  "Close": 2272.39,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773676800000,
+  "Open": 2272.39,
+  "High": 2384.86,
+  "Low": 2268.38,
+  "Close": 2315.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773763200000,
+  "Open": 2315.16,
+  "High": 2348.19,
+  "Low": 2169.02,
+  "Close": 2186.45,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773849600000,
+  "Open": 2186.45,
+  "High": 2232.49,
+  "Low": 2098.16,
+  "Close": 2117.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1773936000000,
+  "Open": 2117.76,
+  "High": 2175.18,
+  "Low": 2103.97,
+  "Close": 2132.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774022400000,
+  "Open": 2132.97,
+  "High": 2167.41,
+  "Low": 2116.22,
+  "Close": 2154.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774108800000,
+  "Open": 2154.16,
+  "High": 2156.04,
+  "Low": 2046.64,
+  "Close": 2081.82,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774195200000,
+  "Open": 2081.83,
+  "High": 2197.61,
+  "Low": 2022.17,
+  "Close": 2127.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774281600000,
+  "Open": 2127.7,
+  "High": 2176.86,
+  "Low": 2117,
+  "Close": 2134.39,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774368000000,
+  "Open": 2134.27,
+  "High": 2197.9,
+  "Low": 2101.98,
+  "Close": 2161.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774454400000,
+  "Open": 2161.65,
+  "High": 2184.62,
+  "Low": 2051.4,
+  "Close": 2069.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774540800000,
+  "Open": 2069.29,
+  "High": 2079.35,
+  "Low": 1967.35,
+  "Close": 1990.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774627200000,
+  "Open": 1990.02,
+  "High": 2046.11,
+  "Low": 1973.4,
+  "Close": 2025.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774713600000,
+  "Open": 2025.85,
+  "High": 2029.29,
+  "Low": 1982.62,
+  "Close": 1992,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774800000000,
+  "Open": 1992,
+  "High": 2083.35,
+  "Low": 1936.61,
+  "Close": 2073.62,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774886400000,
+  "Open": 2073.62,
+  "High": 2091,
+  "Low": 2011.29,
+  "Close": 2054.07,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1774972800000,
+  "Open": 2054.07,
+  "High": 2156.01,
+  "Low": 2053.58,
+  "Close": 2134.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775059200000,
+  "Open": 2134.1,
+  "High": 2167.2,
+  "Low": 2015.66,
+  "Close": 2058.5,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775145600000,
+  "Open": 2058.5,
+  "High": 2080.34,
+  "Low": 2040.37,
+  "Close": 2050.3,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775232000000,
+  "Open": 2050.3,
+  "High": 2060.29,
+  "Low": 2042.93,
+  "Close": 2055.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775318400000,
+  "Open": 2055.19,
+  "High": 2082.82,
+  "Low": 2020.81,
+  "Close": 2052.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775404800000,
+  "Open": 2052.99,
+  "High": 2173.49,
+  "Low": 2047.85,
+  "Close": 2163.51,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775491200000,
+  "Open": 2163.51,
+  "High": 2167.31,
+  "Low": 2059.92,
+  "Close": 2079.31,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775577600000,
+  "Open": 2079.31,
+  "High": 2273.05,
+  "Low": 2076.46,
+  "Close": 2214.69,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775664000000,
+  "Open": 2214.69,
+  "High": 2238.89,
+  "Low": 2156.71,
+  "Close": 2217.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775750400000,
+  "Open": 2217.06,
+  "High": 2256.41,
+  "Low": 2175.63,
+  "Close": 2223.26,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775836800000,
+  "Open": 2223.31,
+  "High": 2256.17,
+  "Low": 2220.12,
+  "Close": 2248.26,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1775923200000,
+  "Open": 2248.26,
+  "High": 2328.61,
+  "Low": 2174.74,
+  "Close": 2185.44,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776009600000,
+  "Open": 2185.42,
+  "High": 2235.02,
+  "Low": 2174.59,
+  "Close": 2208.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776096000000,
+  "Open": 2208.38,
+  "High": 2414.37,
+  "Low": 2199.28,
+  "Close": 2363.67,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776182400000,
+  "Open": 2363.65,
+  "High": 2370.5,
+  "Low": 2301.95,
+  "Close": 2330.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776268800000,
+  "Open": 2330.97,
+  "High": 2384.42,
+  "Low": 2283.92,
+  "Close": 2337.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776355200000,
+  "Open": 2337.46,
+  "High": 2456.09,
+  "Low": 2308.43,
+  "Close": 2440.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776441600000,
+  "Open": 2440.71,
+  "High": 2463.29,
+  "Low": 2342.99,
+  "Close": 2362.22,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776528000000,
+  "Open": 2362.22,
+  "High": 2374.03,
+  "Low": 2296.82,
+  "Close": 2329.47,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776614400000,
+  "Open": 2329.47,
+  "High": 2331.5,
+  "Low": 2251.22,
+  "Close": 2312.54,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776700800000,
+  "Open": 2312.59,
+  "High": 2345.65,
+  "Low": 2289.63,
+  "Close": 2309.19,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776787200000,
+  "Open": 2309.19,
+  "High": 2422.15,
+  "Low": 2284.32,
+  "Close": 2402.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776873600000,
+  "Open": 2402.6,
+  "High": 2412.61,
+  "Low": 2304.65,
+  "Close": 2331.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1776960000000,
+  "Open": 2331.97,
+  "High": 2337.63,
+  "Low": 2283.65,
+  "Close": 2323.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777046400000,
+  "Open": 2323.01,
+  "High": 2327.54,
+  "Low": 2303.09,
+  "Close": 2306.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777132800000,
+  "Open": 2306.99,
+  "High": 2351.09,
+  "Low": 2299.83,
+  "Close": 2347.49,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777219200000,
+  "Open": 2347.49,
+  "High": 2403.39,
+  "Low": 2264.11,
+  "Close": 2273.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777305600000,
+  "Open": 2273.97,
+  "High": 2309.61,
+  "Low": 2256.59,
+  "Close": 2278.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777392000000,
+  "Open": 2278.27,
+  "High": 2345.97,
+  "Low": 2262.36,
+  "Close": 2271.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777478400000,
+  "Open": 2271.18,
+  "High": 2285.73,
+  "Low": 2219.03,
+  "Close": 2264.45,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777564800000,
+  "Open": 2264.45,
+  "High": 2323.92,
+  "Low": 2250.36,
+  "Close": 2306.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777651200000,
+  "Open": 2306.88,
+  "High": 2313.34,
+  "Low": 2277.56,
+  "Close": 2307.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777737600000,
+  "Open": 2307.63,
+  "High": 2342.26,
+  "Low": 2296.39,
+  "Close": 2327.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777824000000,
+  "Open": 2327.43,
+  "High": 2398.14,
+  "Low": 2308.12,
+  "Close": 2348.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777910400000,
+  "Open": 2348.98,
+  "High": 2398.04,
+  "Low": 2335.39,
+  "Close": 2380.04,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1777996800000,
+  "Open": 2380.04,
+  "High": 2423.13,
+  "Low": 2344.91,
+  "Close": 2357.95,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778083200000,
+  "Open": 2357.94,
+  "High": 2365.9,
+  "Low": 2284.63,
+  "Close": 2293.53,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778169600000,
+  "Open": 2293.53,
+  "High": 2303.64,
+  "Low": 2264.66,
+  "Close": 2292.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778256000000,
+  "Open": 2292.18,
+  "High": 2324.46,
+  "Low": 2285.27,
+  "Close": 2316.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778342400000,
+  "Open": 2316.37,
+  "High": 2350.49,
+  "Low": 2313.87,
+  "Close": 2346.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778428800000,
+  "Open": 2346.6,
+  "High": 2382.61,
+  "Low": 2302.68,
+  "Close": 2332.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778515200000,
+  "Open": 2332.43,
+  "High": 2344.94,
+  "Low": 2255.7,
+  "Close": 2261.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778601600000,
+  "Open": 2261.07,
+  "High": 2322.72,
+  "Low": 2233.27,
+  "Close": 2235.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778688000000,
+  "Open": 2235.76,
+  "High": 2298.61,
+  "Low": 2234.76,
+  "Close": 2297.32,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778774400000,
+  "Open": 2297.32,
+  "High": 2318.49,
+  "Low": 2203.99,
+  "Close": 2221.66,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778860800000,
+  "Open": 2221.65,
+  "High": 2231.94,
+  "Low": 2160.64,
+  "Close": 2179.22,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1778947200000,
+  "Open": 2179.22,
+  "High": 2197.3,
+  "Low": 2167.05,
+  "Close": 2185.31,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779033600000,
+  "Open": 2185.31,
+  "High": 2194.05,
+  "Low": 2085.84,
+  "Close": 2106.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779120000000,
+  "Open": 2106.63,
+  "High": 2145.92,
+  "Low": 2076.24,
+  "Close": 2109.3,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779206400000,
+  "Open": 2109.37,
+  "High": 2148.06,
+  "Low": 2101.48,
+  "Close": 2135.85,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779292800000,
+  "Open": 2135.85,
+  "High": 2156.37,
+  "Low": 2104.15,
+  "Close": 2131.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779379200000,
+  "Open": 2131.37,
+  "High": 2152.96,
+  "Low": 2111.49,
+  "Close": 2118.72,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779465600000,
+  "Open": 2118.72,
+  "High": 2129.18,
+  "Low": 2008.77,
+  "Close": 2059.4,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779552000000,
+  "Open": 2059.4,
+  "High": 2149.24,
+  "Low": 2056.11,
+  "Close": 2095.05,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779638400000,
+  "Open": 2095.05,
+  "High": 2137.11,
+  "Low": 2061.18,
+  "Close": 2126.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779724800000,
+  "Open": 2126.12,
+  "High": 2141.21,
+  "Low": 2077.59,
+  "Close": 2086.32,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779811200000,
+  "Open": 2086.32,
+  "High": 2096.8,
+  "Low": 2050.96,
+  "Close": 2070.73,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779897600000,
+  "Open": 2070.73,
+  "High": 2073.84,
+  "Low": 1966.29,
+  "Close": 1989.63,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1779984000000,
+  "Open": 1989.63,
+  "High": 2045.49,
+  "Low": 1975.7,
+  "Close": 2030.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780070400000,
+  "Open": 2030.7,
+  "High": 2043.4,
+  "Low": 2001.16,
+  "Close": 2025.75,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780156800000,
+  "Open": 2025.75,
+  "High": 2036.89,
+  "Low": 2004.73,
+  "Close": 2009.37,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780243200000,
+  "Open": 2009.37,
+  "High": 2022.12,
+  "Low": 1954.79,
+  "Close": 1967.71,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780329600000,
+  "Open": 1967.71,
+  "High": 2008.18,
+  "Low": 1888.91,
+  "Close": 1914.28,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780416000000,
+  "Open": 1914.28,
+  "High": 1941.97,
+  "Low": 1816.29,
+  "Close": 1836.27,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780502400000,
+  "Open": 1836.27,
+  "High": 1850.49,
+  "Low": 1716.46,
+  "Close": 1775.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780588800000,
+  "Open": 1775.93,
+  "High": 1786.04,
+  "Low": 1570.92,
+  "Close": 1582.59,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780675200000,
+  "Open": 1582.48,
+  "High": 1618.69,
+  "Low": 1504.14,
+  "Close": 1559.53,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780761600000,
+  "Open": 1559.52,
+  "High": 1647.22,
+  "Low": 1545.63,
+  "Close": 1629.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780848000000,
+  "Open": 1629.18,
+  "High": 1721.95,
+  "Low": 1602.64,
+  "Close": 1690.61,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1780934400000,
+  "Open": 1690.62,
+  "High": 1713.45,
+  "Low": 1633.33,
+  "Close": 1635.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781020800000,
+  "Open": 1635.77,
+  "High": 1666.55,
+  "Low": 1605.45,
+  "Close": 1657.23,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781107200000,
+  "Open": 1657.23,
+  "High": 1672.82,
+  "Low": 1603.52,
+  "Close": 1644.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781193600000,
+  "Open": 1644.84,
+  "High": 1692.5,
+  "Low": 1632.09,
+  "Close": 1659.29,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781280000000,
+  "Open": 1659.22,
+  "High": 1685.44,
+  "Low": 1656.47,
+  "Close": 1681.32,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781366400000,
+  "Open": 1681.32,
+  "High": 1695.87,
+  "Low": 1654.14,
+  "Close": 1662.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781452800000,
+  "Open": 1662.09,
+  "High": 1848.56,
+  "Low": 1658.18,
+  "Close": 1844.41,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781539200000,
+  "Open": 1844.41,
+  "High": 1846.37,
+  "Low": 1757.97,
+  "Close": 1781.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781625600000,
+  "Open": 1781.58,
+  "High": 1809.16,
+  "Low": 1740.61,
+  "Close": 1772.33,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781712000000,
+  "Open": 1772.33,
+  "High": 1795.33,
+  "Low": 1679.3,
+  "Close": 1681.6,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781798400000,
+  "Open": 1681.55,
+  "High": 1718.44,
+  "Low": 1670.95,
+  "Close": 1706.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781884800000,
+  "Open": 1706.87,
+  "High": 1749.04,
+  "Low": 1692.82,
+  "Close": 1739.65,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1781971200000,
+  "Open": 1739.65,
+  "High": 1745.6,
+  "Low": 1716.52,
+  "Close": 1729.82,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782057600000,
+  "Open": 1729.82,
+  "High": 1778.96,
+  "Low": 1701.07,
+  "Close": 1744.11,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782144000000,
+  "Open": 1744.11,
+  "High": 1747.21,
+  "Low": 1634.29,
+  "Close": 1659.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782230400000,
+  "Open": 1659.09,
+  "High": 1690.91,
+  "Low": 1616.02,
+  "Close": 1617.66,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782316800000,
+  "Open": 1617.6,
+  "High": 1659.18,
+  "Low": 1531.6,
+  "Close": 1569.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782403200000,
+  "Open": 1569.23,
+  "High": 1587.43,
+  "Low": 1511.19,
+  "Close": 1579.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782489600000,
+  "Open": 1579.42,
+  "High": 1610.44,
+  "Low": 1567.07,
+  "Close": 1604.99,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782576000000,
+  "Open": 1604.99,
+  "High": 1607.3,
+  "Low": 1561.76,
+  "Close": 1579.93,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782662400000,
+  "Open": 1579.96,
+  "High": 1596.05,
+  "Low": 1547.44,
+  "Close": 1579.31,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782748800000,
+  "Open": 1579.31,
+  "High": 1636.7,
+  "Low": 1549.96,
+  "Close": 1564.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782835200000,
+  "Open": 1564.58,
+  "High": 1630.26,
+  "Low": 1552.06,
+  "Close": 1619.43,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1782921600000,
+  "Open": 1619.43,
+  "High": 1724.33,
+  "Low": 1596.24,
+  "Close": 1696.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783008000000,
+  "Open": 1696.16,
+  "High": 1752.63,
+  "Low": 1686.09,
+  "Close": 1730.52,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783094400000,
+  "Open": 1730.47,
+  "High": 1798.38,
+  "Low": 1726.96,
+  "Close": 1790.58,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783180800000,
+  "Open": 1790.58,
+  "High": 1807.02,
+  "Low": 1748.7,
+  "Close": 1774.01,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783267200000,
+  "Open": 1774.01,
+  "High": 1807.61,
+  "Low": 1728.82,
+  "Close": 1787.84,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783353600000,
+  "Open": 1787.8,
+  "High": 1833.22,
+  "Low": 1756.68,
+  "Close": 1796.78,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783440000000,
+  "Open": 1796.78,
+  "High": 1811.58,
+  "Low": 1712.52,
+  "Close": 1722.18,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783526400000,
+  "Open": 1722.18,
+  "High": 1761.43,
+  "Low": 1720.97,
+  "Close": 1738.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783612800000,
+  "Open": 1738.7,
+  "High": 1811.29,
+  "Low": 1731.17,
+  "Close": 1790.36,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783699200000,
+  "Open": 1790.36,
+  "High": 1826.99,
+  "Low": 1780.82,
+  "Close": 1813.89,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783785600000,
+  "Open": 1813.89,
+  "High": 1828.8,
+  "Low": 1778.84,
+  "Close": 1819.91,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783872000000,
+  "Open": 1819.9,
+  "High": 1844.91,
+  "Low": 1761.53,
+  "Close": 1775.9,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1783958400000,
+  "Open": 1775.9,
+  "High": 1887.91,
+  "Low": 1749.89,
+  "Close": 1874.42,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784044800000,
+  "Open": 1874.49,
+  "High": 1945.83,
+  "Low": 1860.43,
+  "Close": 1930.81,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784131200000,
+  "Open": 1930.81,
+  "High": 1935.93,
+  "Low": 1866.74,
+  "Close": 1881.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784217600000,
+  "Open": 1881.12,
+  "High": 1882.45,
+  "Low": 1802.72,
+  "Close": 1830,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784304000000,
+  "Open": 1829.99,
+  "High": 1855.51,
+  "Low": 1825.71,
+  "Close": 1843.01,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784390400000,
+  "Open": 1843.01,
+  "High": 1878.31,
+  "Low": 1840.46,
+  "Close": 1870.16,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784476800000,
+  "Open": 1870.16,
+  "High": 1903.88,
+  "Low": 1842.41,
+  "Close": 1901.48,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784563200000,
+  "Open": 1901.48,
+  "High": 1951.95,
+  "Low": 1889.03,
+  "Close": 1930.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784649600000,
+  "Open": 1930.88,
+  "High": 1954.88,
+  "Low": 1909.9,
+  "Close": 1941.97,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784736000000,
+  "Open": 1941.97,
+  "High": 1955.38,
+  "Low": 1882.25,
+  "Close": 1894.55,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784822400000,
+  "Open": 1894.57,
+  "High": 1908.94,
+  "Low": 1847.18,
+  "Close": 1861.15,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784908800000,
+  "Open": 1861.15,
+  "High": 1870.91,
+  "Low": 1850.44,
+  "Close": 1867.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1784995200000,
+  "Open": 1867.06,
+  "High": 1916.61,
+  "Low": 1863.77,
+  "Close": 1914.01,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785081600000,
+  "Open": 1914,
+  "High": 1979.87,
+  "Low": 1907.82,
+  "Close": 1926.72,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785168000000,
+  "Open": 1926.72,
+  "High": 1954.58,
+  "Low": 1856.25,
+  "Close": 1918.92,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785254400000,
+  "Open": 1918.91,
+  "High": 1929.05,
+  "Low": 1883.61,
+  "Close": 1891.23,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785340800000,
+  "Open": 1891.23,
+  "High": 1936.25,
+  "Low": 1874.12,
+  "Close": 1918.1,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785427200000,
+  "Open": 1918.1,
+  "High": 1935.86,
+  "Low": 1847.48,
+  "Close": 1862.06,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785513600000,
+  "Open": 1862.05,
+  "High": 1877.23,
+  "Low": 1857.95,
+  "Close": 1869.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785600000000,
+  "Open": 1869.12,
+  "High": 1883.78,
+  "Low": 1820.78,
+  "Close": 1857.88,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785686400000,
+  "Open": 1857.88,
+  "High": 1897.84,
+  "Low": 1828.04,
+  "Close": 1862.46,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785772800000,
+  "Open": 1862.46,
+  "High": 1881.08,
+  "Low": 1847.49,
+  "Close": 1871.94,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785859200000,
+  "Open": 1871.94,
+  "High": 1884.26,
+  "Low": 1854.68,
+  "Close": 1873.08,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1785945600000,
+  "Open": 1873.01,
+  "High": 1927.32,
+  "Low": 1872.33,
+  "Close": 1909.77,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786032000000,
+  "Open": 1909.77,
+  "High": 1941.77,
+  "Low": 1893.59,
+  "Close": 1917.01,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786118400000,
+  "Open": 1917.02,
+  "High": 1925.71,
+  "Low": 1904.64,
+  "Close": 1921.72,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786204800000,
+  "Open": 1921.73,
+  "High": 1926.31,
+  "Low": 1911.85,
+  "Close": 1925.56,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786291200000,
+  "Open": 1925.56,
+  "High": 1937.37,
+  "Low": 1870.61,
+  "Close": 1876.12,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786377600000,
+  "Open": 1876.12,
+  "High": 1897.1,
+  "Low": 1852.7,
+  "Close": 1862.26,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786464000000,
+  "Open": 1862.25,
+  "High": 1924.24,
+  "Low": 1859.01,
+  "Close": 1892.02,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786550400000,
+  "Open": 1892.02,
+  "High": 1899.35,
+  "Low": 1872.42,
+  "Close": 1879.09,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786636800000,
+  "Open": 1879.11,
+  "High": 1892.33,
+  "Low": 1862.89,
+  "Close": 1880.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786723200000,
+  "Open": 1880.57,
+  "High": 1887.59,
+  "Low": 1872.8,
+  "Close": 1883.96,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786809600000,
+  "Open": 1883.96,
+  "High": 1885.63,
+  "Low": 1876.21,
+  "Close": 1883.03,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786896000000,
+  "Open": 1883.03,
+  "High": 1914.53,
+  "Low": 1868.39,
+  "Close": 1912.21,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1786982400000,
+  "Open": 1912.21,
+  "High": 1922.26,
+  "Low": 1884.94,
+  "Close": 1916.7,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787068800000,
+  "Open": 1916.7,
+  "High": 2128.47,
+  "Low": 1905.67,
+  "Close": 2085.13,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787155200000,
+  "Open": 2085.13,
+  "High": 2337.12,
+  "Low": 2067.66,
+  "Close": 2325.29,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787241600000,
+  "Open": 2325.29,
+  "High": 2449.18,
+  "Low": 2306.91,
+  "Close": 2392.92,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787328000000,
+  "Open": 2393,
+  "High": 2548.43,
+  "Low": 2382.47,
+  "Close": 2410.79,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787414400000,
+  "Open": 2410.79,
+  "High": 2484.89,
+  "Low": 2355.83,
+  "Close": 2437.76,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787500800000,
+  "Open": 2437.77,
+  "High": 2532.06,
+  "Low": 2423.9,
+  "Close": 2486.78,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787587200000,
+  "Open": 2486.78,
+  "High": 2531.39,
+  "Low": 2438.87,
+  "Close": 2481.55,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787673600000,
+  "Open": 2481.55,
+  "High": 2484.31,
+  "Low": 2413.48,
+  "Close": 2448.91,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787760000000,
+  "Open": 2448.91,
+  "High": 2566.2,
+  "Low": 2436.9,
+  "Close": 2520.38,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787846400000,
+  "Open": 2520.38,
+  "High": 2533.98,
+  "Low": 2467.18,
+  "Close": 2470.87,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1787932800000,
+  "Open": 2470.87,
+  "High": 2473.49,
+  "Low": 2404.64,
+  "Close": 2443.56,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1788019200000,
+  "Open": 2443.56,
+  "High": 2482.63,
+  "Low": 2443.56,
+  "Close": 2479.74,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ },
+ {
+  "Ts": 1788105600000,
+  "Open": 2479.74,
+  "High": 2534.14,
+  "Low": 2386.05,
+  "Close": 2466.57,
+  "Vol": 0,
+  "VolCcy": 0,
+  "VolCcyQuote": 0
+ }
+]

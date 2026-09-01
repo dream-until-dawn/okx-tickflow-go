@@ -54,7 +54,7 @@ func TestPathMatchesReality(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	wantDir := filepath.Join(s.Root(), "candles", inst)
+	wantDir := filepath.Join(s.Root(), string(Candles), inst)
 	if filepath.Dir(dat) != wantDir {
 		t.Errorf("Path 给的目录是 %q，期望 %q", filepath.Dir(dat), wantDir)
 	}
@@ -64,7 +64,7 @@ func TestPathMatchesReality(t *testing.T) {
 		}
 	}
 	// 命名空间那一层必须真的存在，不然「以后放逐笔数据」这个理由就落了空。
-	if _, err := os.Stat(filepath.Join(s.Root(), "candles")); err != nil {
+	if _, err := os.Stat(filepath.Join(s.Root(), string(Candles))); err != nil {
 		t.Errorf("candles 命名空间目录不存在: %v", err)
 	}
 
@@ -100,7 +100,7 @@ func TestWriteLockIsExclusive(t *testing.T) {
 	if err := s1.Close(); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := os.Stat(filepath.Join(s1.Root(), lockFile)); !errors.Is(err, os.ErrNotExist) {
+	if _, err := os.Stat(filepath.Join(s1.Root(), string(Candles), lockFile)); !errors.Is(err, os.ErrNotExist) {
 		t.Error("Close 之后锁文件应当被清掉")
 	}
 	s2, err := Open(root)
@@ -346,10 +346,10 @@ func TestLegacyLayoutIsDetected(t *testing.T) {
 	}
 
 	// 按提示挪进命名空间之后就能正常打开。
-	if err := os.MkdirAll(filepath.Join(root, "candles"), 0o755); err != nil {
+	if err := os.MkdirAll(filepath.Join(root, string(Candles)), 0o755); err != nil {
 		t.Fatal(err)
 	}
-	if err := os.Rename(old, filepath.Join(root, "candles", inst)); err != nil {
+	if err := os.Rename(old, filepath.Join(root, string(Candles), inst)); err != nil {
 		t.Fatal(err)
 	}
 	s, err := Open(root)

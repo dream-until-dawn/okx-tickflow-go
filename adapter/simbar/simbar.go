@@ -53,11 +53,17 @@ type Option func(*okxsim.Bar)
 
 // WithMarkPx 设置标记价。
 //
-// 不设时留空，记账内核会用最新价顶替（它的 markPx() 就是这么做的）。标记价
-// 影响强平判定与未实现盈亏，能拿到真的就该给。
+// 不设时留空，记账内核会用最新价顶替（它的 markPx() 就是这么做的）。**那是个
+// 会静默产生假阴性的退化**：强平判据本该看标记价，用最新成交价会让影线扫掉
+// 本不该爆的仓位。能拿到真的就该给。
 //
-// 上游 okx-api-v5-go 目前没有 mark-price-candles 端点，所以本库暂时也拿不到
-// 标记价序列；等它补上，这里接上即可，Bar 的形态不用改。
+// 拿法：tickflow 的 Feed 配上 MarkStore 之后，v.MarkPx() 就是这一根的标记价。
+//
+//	bar, _ := simbar.ToBar(inst, v.Candle(), simbar.WithMarkPx(v.MarkPx()))
+//
+// px 为 NaN（标记价在这个时刻缺根）时【等同于不设】——Dec 把 NaN 转成零值，
+// 而记账内核只认正数的 MarkPx。想让缺标记价直接报错而不是静默退化，
+// 在记账内核那边打开 Config.RequireMarkPx。
 func WithMarkPx(px float64) Option {
 	return func(b *okxsim.Bar) { b.MarkPx = Dec(px) }
 }
