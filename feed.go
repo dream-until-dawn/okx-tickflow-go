@@ -10,7 +10,7 @@ import (
 
 // warmupSlack 是预热时多读的倍数。
 //
-// 指标需要 n 根才有值，但「n 根 K 线」占多长时间是不确定的——小币种或维护期
+// 指标需要 n 根才收敛，但「n 根 K 线」占多长时间是不确定的——小币种或维护期
 // OKX 根本不产出那几根。按周期步长直接换算出来的时间窗口会偏短，多读一倍来兜底。
 // 真的碰上空洞多到读不满的情况，View.Ready() 会如实报 false，而不是给出一个
 // 用半截历史算出来的指标值。
@@ -54,12 +54,16 @@ type FeedConfig struct {
 
 	// WarmFrom 覆盖自动算出的预热起点（毫秒）。0 表示自动。
 	//
-	// 自动预热会按各周期的 max(Warmup) 加 Lookback 往前多读一段，喂给指标
-	// 但不产出步进。知道自己要多少历史时可以用它接管。
+	// 自动预热会按各周期的 max(Settle) 加 Lookback 往前多读一段，喂给指标但不
+	// 产出步进。用 Settle 而不是 Warmup：递归类指标（MACD 等）在「有定义」之后
+	// 还要走上百根才不再受播种影响，只按 Warmup 预热会让值错到一倍。
+	// 知道自己要多少历史时可以用它接管。
 	WarmFrom int64
 
 	// NoAutoWarmup 关掉自动预热，直接从 From 开始读。
-	// 此时开头若干根的指标会是 NaN，用 View.Ready() 判断。
+	//
+	// 此时开头若干根的指标会是 NaN 或【尚未收敛】，用 View.Ready() 判断——
+	// 它按「已收敛」判，不是「有定义」。
 	NoAutoWarmup bool
 
 	// MarkStore 提供【标记价】K 线，跟着主周期锁步推进，由 View.MarkPx 与
@@ -242,7 +246,7 @@ func (f *Feed) openIterators(cfg FeedConfig) error {
 		f.from = meta.FirstTs
 	}
 
-	// 每个周期按自己的 max(Warmup) + Lookback 往前多读一段。
+	// 每个周期按自己的 max(Settle) + Lookback 往前多读一段。
 	warmOf := func(s *tfSeries) int64 {
 		if cfg.WarmFrom > 0 {
 			return cfg.WarmFrom
@@ -250,7 +254,7 @@ func (f *Feed) openIterators(cfg FeedConfig) error {
 		if cfg.NoAutoWarmup {
 			return f.from
 		}
-		return warmStart(s.period, f.from, (s.warmup+s.capN)*warmupSlack)
+		return warmStart(s.period, f.from, (s.settle+s.capN)*warmupSlack)
 	}
 
 	baseWarm := warmOf(f.base)
@@ -552,7 +556,8 @@ type tfSeries struct {
 	widths []int
 	keys   []string
 	keyIdx map[string]int
-	warmup int
+	warmup int // 值从此【有定义】所需的根数
+	settle int // 值从此【不再取决于从哪根开始喂】所需的根数
 
 	capN    int
 	candles []Candle
@@ -588,6 +593,12 @@ func newTFSeries(bar string, p Period, inds []Indicator, lookback int) (*tfSerie
 		s.widths = append(s.widths, len(ks))
 		if w := ind.Warmup(); w > s.warmup {
 			s.warmup = w
+		}
+		// Warmup 与 Settle 是两回事：前者是「有定义」，后者是「不再取决于从哪根
+		// 开始喂」。递归类指标（EMA / MACD / RSI / 国内口径 KDJ）两者相差一到两个
+		// 数量级——只按 Warmup 预热，MACD 的值能错一倍，而 Ready() 还报 true。
+		if n := IndicatorSettle(ind); n > s.settle {
+			s.settle = n
 		}
 		ind.Reset()
 	}
@@ -643,7 +654,15 @@ func (s *tfSeries) markAt(abs int64) Candle {
 	return s.marks[int(abs%int64(s.capN))]
 }
 
-func (s *tfSeries) ready() bool { return s.n >= int64(s.warmup) }
+// ready 报告本周期的指标值是否【可信】。
+//
+// 用 settle 而不是 warmup：warmup 只保证「算得出一个数」，而递归类指标在那之后
+// 还要走上百根才不再受播种影响。历史不够长时 ready 会一直是 false——那是对的，
+// 让人拿到一个错一倍的 MACD 却报 ready，才是真正的问题。
+func (s *tfSeries) ready() bool { return s.n >= int64(s.settle) }
+
+// defined 报告指标值是否已有定义（不是 NaN），但不保证已收敛。
+func (s *tfSeries) defined() bool { return s.n >= int64(s.warmup) }
 
 func (s *tfSeries) view() View { return View{s: s, abs: s.n - 1} }
 
@@ -677,10 +696,22 @@ func (v View) Bar() string {
 // Prev 往回看 n 根。n 不能超过 FeedConfig.Lookback，否则得到无效视图。
 func (v View) Prev(n int) View { return View{s: v.s, abs: v.abs - int64(n)} }
 
-// Ready 报告本周期的指标是否都已 warmup 完。
+// Ready 报告本周期的指标值是否【可信】——不只是「算得出来」，而是「不再取决于
+// 从哪根开始喂」。典型用法是在循环开头 if !v.Ready() { continue }。
 //
-// 没就绪时指标值是 NaN。典型用法是在循环开头 if !v.Ready() { continue }。
+// 这两件事对窗口类指标是一回事，对递归类（EMA / MACD / RSI / 国内口径 KDJ）
+// 差一到两个数量级。实测 MACD(12,26,9) 国内口径：Warmup() 报 1，而只喂 4 根时
+// dif 的相对误差是 1.01——值错了一倍。所以 Ready 按 Settle 判，不按 Warmup。
+//
+// 历史不够长时 Ready 会一直是 false。那是对的：拿不到可信的值，就该说拿不到。
+// 真要那个「已有定义但未必收敛」的弱判据，用 Defined。
 func (v View) Ready() bool { return v.s != nil && v.s.ready() }
+
+// Defined 报告指标值是否已有定义（不是 NaN），但【不保证已收敛】。
+//
+// 这是比 Ready 弱的判据。除非你清楚递归类指标的播种影响对你的策略无所谓，
+// 否则用 Ready。
+func (v View) Defined() bool { return v.s != nil && v.s.defined() }
 
 // Candle 返回这一根 K 线；视图无效时返回零值。
 func (v View) Candle() Candle {

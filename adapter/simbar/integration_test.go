@@ -37,8 +37,12 @@ func TestThreeLibrariesCompose(t *testing.T) {
 	feed, err := tickflow.NewFeed(store, tickflow.FeedConfig{
 		InstID: inst, Base: "15m", Extra: []string{"1H"},
 		Aggregate: true, Lookback: 3,
+		// 只挂【窗口类】指标。这条测试验的是三个库接得上，而递归类指标
+		// （MACD 等）要几百根才收敛——夹具只有 300 根，挂上去 Ready() 会一直是
+		// false，这条测试就变成了对预热的测试。收敛那件事由 indicator 包的
+		// settle_test.go 和根包的 feed_settle_test.go 覆盖。
 		Indicators: map[string][]tickflow.Indicator{
-			"15m": {indicator.MA(20), indicator.MACD(12, 26, 9)},
+			"15m": {indicator.MA(5), indicator.MA(20)},
 		},
 	})
 	if err != nil {
