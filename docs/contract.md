@@ -70,7 +70,7 @@
 | 自聚合与 OKX 官方 1H **逐位相同**：2879 根，OHLC 共 11516 项 + 成交量，零不一致 | 120 天 15m 聚成 1H 对账 | 同上 |
 | **OKX 平台的指标用 CN 口径**（MACD 柱与 KDJ 都对上 CN、对不上 TV） | 使用者在 OKX 平台上逐行比对 ETH 日线 | `go test -run TestMatchesOKXPlatform ./indicator/` |
 | `float64 → decimal` 无损：按位相等且逐位相同 | 真实行情全部 OHLCV + 各量级刻度 | `cd adapter/simbar && go test -run TestFloat64ToDecimalIsLossless` |
-| 指标性能：九个一整套 **202 ns/步**，零分配 | Ryzen 7 5700X | `go test -bench . ./indicator/` |
+| 指标性能：九个一整套 **215 ns/步**，零分配 | Ryzen 7 5700X | `go test -bench . ./indicator/` |
 | **「有定义」与「已收敛」差一到两个数量级**：MACD(12,26,9)/CN 的 `Warmup()` 报 1、实测 428 根才逐位收敛；只喂 4 根时 dif 的相对误差是 **1.01** | 500 根真实 ETH 日线，逐个预读量比对 | `go test -run TestSettle ./indicator/` |
 | Feed 热路径零分配：推进一步 30ns（单周期）/ 65ns（三周期聚合），`At(handle)` 1.7ns | 同上 | `go test -bench Feed .` |
 | 并发安全：一写六读、多游标、并发构造指标，竞态检测无告警 | 真并发的测试 + `-race` | `go test -race ./...`（Windows 需 MinGW-w64） |
@@ -102,6 +102,8 @@
 | 日内档的边界是固定还是滚动窗口 | **证据指向固定，但证伪不了「缓慢滚动」**。两条证据见下方那一节 | 若真是滚动的，可用区间会随时间**悄悄缩短**——`SyncReport.Gaps` 会把取不到的段列出来 |
 | 历史边界**随周期而变**：标记价日线档港时 `2020-01-01`、日内档 `2020-01-03`；成交价各合约不同且同样分两档 | 生产环境二分查边界（`TestLiveHistoryFloorVariesByBar`） | 任何不带 `bar` 前提的边界表述都是错的，见下方那一节 |
 | OKX 平台的指标口径是 CN | 2026-09-01 实测 | `TestMatchesOKXPlatform` 会先炸——但只在有人跑测试时 |
+| 窗口类指标（MA/BOLL/CCI/KDJ-TV）**从任何起点喂都逐位相同** | 两份数据、五个起点实测 | `TestWindowedAreBitReproducibleAcrossStarts` |
+| 每个指标的**每一路输出**都在声明的 `Settle()` 之内收敛 | 两份数据当场实测收敛点 | `TestSettleCoversMeasuredConvergence` |
 | 6H 及以上按香港时间对齐 | OKX 文档说的，且实测对上 | 同 2D/3D |
 
 ---

@@ -178,7 +178,7 @@ indicator.SetDefaultConvention(indicator.TV) // 或改全局默认
 对不上了，而后者正是批量定义。递归类指标本就以递推定义，两种算法是同一个。
 
 代价实测（Ryzen 7 5700X，全部零分配）：MA(20) 11ns、EMA(20) 5ns、MACD 7ns、
-BOLL(20) 35ns、CCI(20) 39ns、KDJ 42ns、RSI 7ns。**九个指标一整套 202ns/步**——
+BOLL(20) 40ns、CCI(20) 43ns、KDJ 43ns、RSI 7ns。**九个指标一整套 215ns/步**——
 百万步的回测在指标上一共花 0.2 秒。
 
 ## Feed：可步进的多周期视图
