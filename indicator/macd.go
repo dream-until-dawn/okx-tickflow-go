@@ -69,6 +69,12 @@ func (m *macdIndicator) Warmup() int {
 	return m.slow + m.signal - 1
 }
 
+// Settle 见 tickflow.Settler。
+//
+// 两级串联：慢线 EMA 先收敛，DEA 吃的是 DIF，还要在它之上再衰减一轮。
+// 所以两级相加，而不是取最大值。
+func (m *macdIndicator) Settle() int { return m.emaSlow.settle() + m.dea.settle() }
+
 func (m *macdIndicator) Update(c tickflow.Candle) []float64 {
 	fast, okF := m.emaFast.update(c.Close)
 	slow, okS := m.emaSlow.update(c.Close)

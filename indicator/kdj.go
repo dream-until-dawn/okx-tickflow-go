@@ -75,6 +75,17 @@ func (k *kdjIndicator) Warmup() int {
 	return k.n + k.m1 + k.m2 - 2
 }
 
+// Settle 见 tickflow.Settler。
+//
+// TV 口径用的是简单移动平均，窗口滑过去就与更早的数据无关，Warmup 即收敛点。
+// CN 口径是两级指数平滑串联，要在 RSV 就位之后再各自衰减一轮。
+func (k *kdjIndicator) Settle() int {
+	if k.conv != CN {
+		return k.Warmup()
+	}
+	return k.n + k.kSm.settle() + k.dSm.settle()
+}
+
 func (k *kdjIndicator) Update(c tickflow.Candle) []float64 {
 	k.wh.push(c.High)
 	k.wl.push(c.Low)

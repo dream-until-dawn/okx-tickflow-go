@@ -54,6 +54,26 @@ func (s *smoother) update(x float64) (float64, bool) {
 	return s.val, true
 }
 
+// settleEps 是「播种痕迹已可忽略」的判据。
+//
+// 递归平均的初值影响按 (1-α)^k 衰减，数学上【永远不为零】，所以「收敛」必须挑一个
+// 阈值。
+//
+// 取 1e-15 而不是一个更宽松的数，是为了让 Settle() 覆盖到【逐位相等】——
+// 那是 float64 舍入级的判据，约 2.2e-16。取 1e-12 的话算出来的根数会比实测的
+// 逐位收敛点少几十根（EMA(20) 少 59、RSI(14) 少 83），测试就没法用严格相等来断言。
+// 多读的那几十根 K 线不值得为之放松判据。
+const settleEps = 1e-15
+
+// settle 返回播种痕迹衰减到 settleEps 以下所需的样本数。
+func (s *smoother) settle() int {
+	if s.alpha >= 1 {
+		return s.seedN // α=1 时新值完全覆盖旧值，播种痕迹一步就没了
+	}
+	k := math.Log(settleEps) / math.Log(1-s.alpha)
+	return s.seedN + int(math.Ceil(k))
+}
+
 func (s *smoother) reset() {
 	s.acc, s.cnt, s.val, s.ready = 0, 0, 0, false
 }

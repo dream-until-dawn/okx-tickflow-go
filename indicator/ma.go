@@ -75,6 +75,10 @@ func (e *emaIndicator) Warmup() int {
 	return e.n
 }
 
+// Settle 见 tickflow.Settler：EMA 是递归的，播种痕迹要走很久才衰减掉。
+// 实测 EMA(20) 国内口径 Warmup() 报 1，实际要 337 根。
+func (e *emaIndicator) Settle() int { return e.s.settle() }
+
 func (e *emaIndicator) Update(c tickflow.Candle) []float64 {
 	v, ok := e.s.update(c.Close)
 	if !ok {

@@ -58,6 +58,10 @@ func (r *rsiIndicator) Warmup() int {
 	return r.n + 1
 }
 
+// Settle 见 tickflow.Settler。均涨与均跌用同一个 α，取其一即可；
+// 加 1 是因为第一根没有「前收」，涨跌幅从第二根才开始有。
+func (r *rsiIndicator) Settle() int { return r.up.settle() + 1 }
+
 func (r *rsiIndicator) Update(c tickflow.Candle) []float64 {
 	if !r.hasPrev {
 		r.prev, r.hasPrev = c.Close, true
