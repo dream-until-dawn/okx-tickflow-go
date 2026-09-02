@@ -252,7 +252,14 @@ func TestLiveMarkAndIndexCandles(t *testing.T) {
 	}
 }
 
-// TestLiveMarkPriceHistoryFloor 量出标记价历史那条硬线。
+// TestLiveMarkPriceHistoryFloor 量出标记价历史那条硬线，【在 1D 上】。
+//
+// ⚠️ 这条测试只覆盖 1D。边界随周期而变——日内档（1H/15m/1m）比日线档晚两天，
+// 成交价那一侧的边界也随周期变。跨周期的部分由 TestLiveHistoryFloorVariesByBar
+// 覆盖，contract.md 里的表带 bar 列。
+//
+// 这段限定语是补上去的：本测试最初的注释把边界写得像是与周期无关，
+// contract.md 照抄了那个说法，于是两个下游仓都把日线的边界当成了通用边界。
 //
 // 这一条一度被写成「标记价与普通 K 线同深」——那是错的，而错误的来源值得记下来：
 // 最初的测量是在【模拟盘】上做的，模拟盘的两条序列在同一天一起截断（那是模拟盘
@@ -290,6 +297,8 @@ func TestLiveMarkPriceHistoryFloor(t *testing.T) {
 
 	// 这条线是【港时】的——1D 按港时对齐，UTC 2019-12-31 16:00 开盘那根就是港时
 	// 2020-01-01。用 1Dutc 的人看到的日期会不一样。
+	//
+	// 这是【日线档】的硬线。日内档是 2020-01-03，见 TestLiveHistoryFloorVariesByBar。
 	floorHK := "2020-01-01"
 
 	var older, sameDepth int
@@ -327,5 +336,132 @@ func TestLiveMarkPriceHistoryFloor(t *testing.T) {
 	if older == 0 || sameDepth == 0 {
 		t.Fatalf("样本没覆盖两种情形（比硬线早的 %d 个、同深的 %d 个），这个测试说明不了什么",
 			older, sameDepth)
+	}
+}
+
+// oldestBefore 问「有没有早于 ts 的数据」。OKX 的 after 语义就是「返回早于该 ts 的」，
+// 所以这是个直接的边界探针，不必把整条序列翻一遍。
+func oldestBefore(t *testing.T, c *okx.Client, series okxsource.Series, inst, bar string, ts int64) int64 {
+	t.Helper()
+	r := okx.CandlesRequest{InstID: inst, Bar: bar, After: ts, Limit: 100}
+	var (
+		cs  []okx.Candle
+		err error
+	)
+	switch series {
+	case okxsource.MarkPrice:
+		cs, err = c.Market.HistoryMarkPriceCandles(context.Background(), r)
+	default:
+		cs, err = c.Market.HistoryCandles(context.Background(), r)
+	}
+	if err != nil {
+		t.Fatalf("%s %s/%s after=%d: %v", series, inst, bar, ts, err)
+	}
+	time.Sleep(90 * time.Millisecond)
+	if len(cs) == 0 {
+		return 0
+	}
+	m := cs[0].Ts
+	for _, x := range cs {
+		if x.Ts < m {
+			m = x.Ts
+		}
+	}
+	return m
+}
+
+// historyFloor 二分出最早可得的那根。
+func historyFloor(t *testing.T, c *okx.Client, series okxsource.Series, inst, bar string) int64 {
+	t.Helper()
+	lo := time.Date(2018, 1, 1, 0, 0, 0, 0, time.UTC).UnixMilli()
+	hi := time.Now().UnixMilli()
+	if oldestBefore(t, c, series, inst, bar, hi) == 0 {
+		return 0
+	}
+	best := int64(0)
+	for lo < hi {
+		mid := lo + (hi-lo)/2
+		if got := oldestBefore(t, c, series, inst, bar, mid); got != 0 {
+			best, hi = got, mid
+		} else {
+			lo = mid + 1
+		}
+	}
+	return best
+}
+
+// TestLiveHistoryFloorVariesByBar 是本文件里最容易被读错的一条：
+// **历史边界随【周期】而变，两条序列都是。**
+//
+// 这条曾经以另一种形式写错过：contract.md 里那张表量的是 1D，却没有 bar 列，
+// 于是两个下游仓都把日线的边界当成了通用边界，写进各自的文档。日内周期上，
+// 标记价晚两天、成交价晚十几到二十几天——按 1D 的数去规划 1m 的回测区间，
+// 差出来的那一段根本不存在。
+//
+// 上一次的教训是「两条都取不到」与「两条一样深」长得一样；这一次是
+// **「1D 的边界」与「与周期无关的边界」在表格上长得一样**。同一类错。
+func TestLiveHistoryFloorVariesByBar(t *testing.T) {
+	c := liveClient(t)
+	hk := time.FixedZone("HKT", 8*3600)
+	day := func(ms int64) string {
+		if ms == 0 {
+			return "取不到"
+		}
+		return time.UnixMilli(ms).In(hk).Format("2006-01-02 15:04")
+	}
+
+	// 只取两档代表：1D 与 1m。中间的 15m / 1H 实测与 1m 同档，
+	// 全测一遍要多花两倍时间而不多说明什么。
+	for _, inst := range []string{"BTC-USDT-SWAP", "ETH-USDT-SWAP"} {
+		var (
+			tradeDaily = historyFloor(t, c, okxsource.Trades, inst, "1D")
+			tradeMin   = historyFloor(t, c, okxsource.Trades, inst, "1m")
+			markDaily  = historyFloor(t, c, okxsource.MarkPrice, inst, "1D")
+			markMin    = historyFloor(t, c, okxsource.MarkPrice, inst, "1m")
+		)
+		t.Logf("%-14s 成交价 1D %s / 1m %s   标记价 1D %s / 1m %s",
+			inst, day(tradeDaily), day(tradeMin), day(markDaily), day(markMin))
+
+		for _, v := range []struct {
+			name string
+			ts   int64
+		}{{"成交价 1D", tradeDaily}, {"成交价 1m", tradeMin},
+			{"标记价 1D", markDaily}, {"标记价 1m", markMin}} {
+			if v.ts == 0 {
+				t.Fatalf("%s 的 %s 一根都取不到", inst, v.name)
+			}
+		}
+
+		// 核心断言：日内档【严格晚于】日线档。两条序列都是。
+		// 这一条不成立，就说明边界与周期无关了，那张表可以合并——但在此之前，
+		// 任何不带 bar 的边界表述都是错的。
+		if tradeMin <= tradeDaily {
+			t.Errorf("%s 的成交价 1m 边界 %s 不晚于 1D 的 %s——"+
+				"「边界随周期而变」这条要重验", inst, day(tradeMin), day(tradeDaily))
+		}
+		if markMin <= markDaily {
+			t.Errorf("%s 的标记价 1m 边界 %s 不晚于 1D 的 %s——同上",
+				inst, day(markMin), day(markDaily))
+		}
+		// 同一档内，标记价晚于成交价（这两个合约都早于标记价那条硬线上线）。
+		if markDaily <= tradeDaily || markMin <= tradeMin {
+			t.Errorf("%s 的标记价边界不晚于成交价——与已知形态不符", inst)
+		}
+	}
+
+	// 标记价那两档是【跨合约一致】的硬线，成交价则各合约不同（跟上线时间走）。
+	const (
+		markDailyHK = "2020-01-01 00:00"
+		markMinHK   = "2020-01-03 00:00"
+	)
+	for _, inst := range []string{"BTC-USDT-SWAP", "ETH-USDT-SWAP"} {
+		if got := day(historyFloor(t, c, okxsource.MarkPrice, inst, "1D")); got != markDailyHK {
+			t.Errorf("%s 的标记价日线硬线是 %s，文档记的是 %s——观察结论变了，该改文档",
+				inst, got, markDailyHK)
+		}
+		if got := day(historyFloor(t, c, okxsource.MarkPrice, inst, "1m")); got != markMinHK {
+			t.Errorf("%s 的标记价日内硬线是 %s，文档记的是 %s——同上",
+				inst, got, markMinHK)
+		}
 	}
 }
